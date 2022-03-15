@@ -140,6 +140,10 @@ export default {
     displayVersion() {
       let { displayVersion } = getVersionInfo(this.$store);
 
+      if (this.featureRancherDesktop) {
+        return process.env.version;
+      }
+
       if (this.isVirtualProduct && this.isSingleVirtualCluster) {
         const setting = this.$store.getters['harvester/byId'](HCI.SETTING, 'server-version');
 
@@ -159,6 +163,10 @@ export default {
 
     isVirtualProduct() {
       return this.$store.getters['currentProduct'].name === HARVESTER;
+    },
+
+    featureRancherDesktop() {
+      return this.$config.rancherEnv === 'desktop';
     },
 
     supportLink() {
