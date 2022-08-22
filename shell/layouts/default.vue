@@ -152,6 +152,10 @@ export default {
         return this.isSingleProduct?.getVersionInfo(this.$store);
       }
 
+      if (this.featureRancherDesktop) {
+        return process.env.version;
+      }
+
       const { displayVersion } = getVersionInfo(this.$store);
 
       return displayVersion;
@@ -167,6 +171,10 @@ export default {
 
     isVirtualProduct() {
       return this.$store.getters['currentProduct'].name === HARVESTER;
+    },
+
+    featureRancherDesktop() {
+      return this.$config.rancherEnv === 'desktop';
     },
 
     supportLink() {
