@@ -165,6 +165,10 @@ export default {
     hasSupport() {
       return isRancherPrime() || this.$store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.SUPPORTED )?.value === 'true';
     },
+
+    hideMenu() {
+      return this.$config.rancherEnv === 'desktop';
+    }
   },
 
   watch: {
@@ -215,7 +219,7 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div v-if="!hideMenu">
     <div
       data-testid="top-level-menu"
       class="menu"

@@ -334,6 +334,14 @@ export default {
       return this.showClusterMetrics || this.showK8sMetrics || this.showEtcdMetrics;
     },
 
+    featureRancherDesktop() {
+      return this.$config.rancherEnv === 'desktop';
+    },
+
+    showMonitoringInstall() {
+      return !this.featureRancherDesktop && !monitoringStatus.v2 && !monitoringStatus.v1;
+    },
+
     hasBadge() {
       return !!this.currentCluster?.badge;
     },
@@ -456,14 +464,11 @@ export default {
         <i class="icon icon-warning" />
       </p>
       <div :style="{'flex':1}" />
-      <div v-if="!monitoringStatus.v2 && !monitoringStatus.v1">
+      <div v-if="showMonitoringInstall">
         <n-link
           :to="{name: 'c-cluster-explorer-tools'}"
           class="monitoring-install"
-        >
-          <i class="icon icon-gear" />
-          <span>{{ t('glance.installMonitoring') }}</span>
-        </n-link>
+        />
       </div>
       <div v-if="monitoringStatus.v1">
         <span>{{ t('glance.v1MonitoringInstalled') }}</span>
