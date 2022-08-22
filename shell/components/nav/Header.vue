@@ -122,6 +122,10 @@ export default {
       return validClusterOrProduct && notSimple && validFilterSettings;
     },
 
+    showNavigation() {
+      return !this.featureRancherDesktop;
+    },
+
     featureRancherDesktop() {
       return this.$config.rancherEnv === 'desktop';
     },
@@ -297,32 +301,103 @@ export default {
   <header
     ref="header"
   >
-    <div>
-      <TopLevelMenu v-if="isMultiCluster || !isSingleProduct" />
-    </div>
-    <div
-      class="menu-spacer"
-      :class="{'isSingleProduct': isSingleProduct }"
-    >
-      <n-link
-        v-if="isSingleProduct"
-        :to="singleProductLogoRoute"
-      >
-        <img
-          class="side-menu-logo"
-          :src="isSingleProduct.logo"
-        >
-      </n-link>
-    </div>
-    <div
-      v-if="!simple"
-      ref="product"
-      class="product"
-    >
+    <div class="rd-header-left">
+      <div>
+        <TopLevelMenu v-if="isMultiCluster || !isSingleProduct" />
+      </div>
       <div
-        v-if="currentProduct && currentProduct.showClusterSwitcher"
-        v-tooltip="nameTooltip"
-        class="cluster cluster-clipped"
+        v-if="showNavigation"
+        class="menu-spacer"
+        :class="{'isSingleProduct': isSingleProduct }"
+      >
+        <n-link
+          v-if="isSingleProduct"
+          :to="singleProductLogoRoute"
+        >
+          <img
+            class="side-menu-logo"
+            :src="isSingleProduct.logo"
+          >
+        </n-link>
+      </div>
+      <div
+        class="menu-spacer"
+        :class="{'isSingleProduct': isSingleProduct }"
+      >
+        <n-link
+          v-if="isSingleProduct"
+          :to="singleProductLogoRoute"
+        >
+          <img
+            class="side-menu-logo"
+            :src="isSingleProduct.logo"
+          >
+        </n-link>
+      </div>
+      <div
+        v-if="!simple"
+        ref="product"
+        class="product"
+      >
+        <div
+          v-if="currentProduct && currentProduct.showClusterSwitcher"
+          v-tooltip="nameTooltip"
+          class="cluster cluster-clipped"
+        >
+          <div
+            v-if="isSingleProduct"
+            class="product-name"
+          >
+            {{ t(isSingleProduct.productNameKey) }}
+          </div>
+          <template v-else>
+            <ClusterProviderIcon
+              v-if="currentCluster"
+              :cluster="currentCluster"
+              class="mr-10"
+            />
+            <div
+              v-if="currentCluster"
+              ref="clusterName"
+              class="cluster-name"
+            >
+              {{ currentCluster.spec.displayName }}
+            </div>
+            <ClusterBadge
+              v-if="currentCluster"
+              :cluster="currentCluster"
+              class="ml-10"
+            />
+            <div
+              v-if="!currentCluster"
+              class="simple-title"
+            >
+              <BrandImage
+                class="side-menu-logo-img"
+                file-name="rancher-logo.svg"
+              />
+            </div>
+          </template>
+        </div>
+        <div
+          v-if="currentProduct && !currentProduct.showClusterSwitcher"
+          class="cluster"
+        >
+          <img
+            v-if="currentProduct.iconHeader"
+            v-bind="$attrs"
+            :src="currentProduct.iconHeader"
+            class="cluster-os-logo mr-10"
+            style="width: 44px; height: 36px;"
+          >
+          <div class="product-name">
+            {{ prod }}
+          </div>
+        </div>
+      </div>
+      <div
+        v-else
+        class="simple-title"
       >
         <div
           v-if="isSingleProduct"
@@ -330,70 +405,16 @@ export default {
         >
           {{ t(isSingleProduct.productNameKey) }}
         </div>
-        <template v-else>
-          <ClusterProviderIcon
-            v-if="currentCluster"
-            :cluster="currentCluster"
-            class="mr-10"
-          />
-          <div
-            v-if="currentCluster"
-            ref="clusterName"
-            class="cluster-name"
-          >
-            {{ currentCluster.spec.displayName }}
-          </div>
-          <ClusterBadge
-            v-if="currentCluster"
-            :cluster="currentCluster"
-            class="ml-10"
-          />
-          <div
-            v-if="!currentCluster"
-            class="simple-title"
-          >
-            <BrandImage
-              class="side-menu-logo-img"
-              file-name="rancher-logo.svg"
-            />
-          </div>
-        </template>
-      </div>
-      <div
-        v-if="currentProduct && !currentProduct.showClusterSwitcher"
-        class="cluster"
-      >
-        <img
-          v-if="currentProduct.iconHeader"
-          v-bind="$attrs"
-          :src="currentProduct.iconHeader"
-          class="cluster-os-logo mr-10"
-          style="width: 44px; height: 36px;"
-        >
-        <div class="product-name">
-          {{ prod }}
-        </div>
-      </div>
-    </div>
-    <div
-      v-else
-      class="simple-title"
-    >
-      <div
-        v-if="isSingleProduct"
-        class="product-name"
-      >
-        {{ t(isSingleProduct.productNameKey) }}
-      </div>
 
-      <div
-        v-else
-        class="side-menu-logo"
-      >
-        <BrandImage
-          class="side-menu-logo-img"
-          file-name="rancher-logo.svg"
-        />
+        <div
+          v-else
+          class="side-menu-logo"
+        >
+          <BrandImage
+            class="side-menu-logo-img"
+            file-name="rancher-logo.svg"
+          />
+        </div>
       </div>
     </div>
 
@@ -642,19 +663,6 @@ export default {
     display: flex;
     z-index: z-index('mainHeader');
 
-    > .spacer {
-      flex: 1;
-    }
-
-    > .menu-spacer {
-      flex: 0 0 calc(var(--header-height) + 10px);
-
-      &.isSingleProduct  {
-        display: flex;
-        justify-content: center;
-      }
-    }
-
     .title {
       border-left: 1px solid var(--header-border);
       padding-left: 10px;
@@ -715,28 +723,6 @@ export default {
       }
     }
 
-    > .product {
-      align-items: center;
-      position: relative;
-      display: flex;
-
-      .logo {
-        height: 30px;
-        position: absolute;
-        top: 9px;
-        left: 0;
-        z-index: 2;
-
-        img {
-          height: 30px;
-        }
-      }
-    }
-
-    .product-name {
-      font-size: 16px;
-    }
-
     .side-menu-logo {
       align-items: center;
       display: flex;
@@ -756,6 +742,45 @@ export default {
     > * {
       background-color: var(--header-bg);
       border-bottom: var(--header-border-size) solid var(--header-border);
+    }
+
+    .rd-header-left {
+      display: flex;
+      flex: 1;
+      flex-direction: row;
+      grid-area: header-left;
+      padding-left: 0.25rem;
+
+      > .menu-spacer {
+        flex: 0 0 calc(var(--header-height) + 10px);
+
+        &.isSingleProduct  {
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      > .product {
+        align-items: center;
+        position: relative;
+        display: flex;
+
+        .logo {
+          height: 30px;
+          position: absolute;
+          top: 9px;
+          left: 0;
+          z-index: 2;
+
+          img {
+            height: 30px;
+          }
+        }
+      }
+
+      .product-name {
+        font-size: 16px;
+      }
     }
 
     .rd-header-right {
