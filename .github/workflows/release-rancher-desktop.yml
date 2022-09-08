@@ -9,8 +9,8 @@ env:
   OUTPUT_DIR: dist
   RELEASE_DIR: release
   ARTIFACT_NAME: rancher-dashboard-desktop-embed
-  API: "https://127.0.0.1:9443"
-  RESOURCE_BASE: "https://127.0.0.1:9443"
+  API: "https://127.0.0.1:6120"
+  RESOURCE_BASE: "https://127.0.0.1:6120"
   
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
     
     - name: Install & Build
       run:
-        ROUTER_BASE="/dashboard" RANCHER_ENV=desktop ./.github/workflows/scripts/build-dashboard.sh
+        RANCHER_ENV=desktop ./.github/workflows/scripts/build-dashboard.sh
 
     - name: Upload Build
       uses: actions/upload-artifact@v2
