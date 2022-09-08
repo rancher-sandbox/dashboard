@@ -4,7 +4,7 @@ import { parse as setCookieParser } from 'set-cookie-parser';
 import pkg from '../package.json';
 
 export default function({
-  $axios, $cookies, isDev, req
+  $axios, $cookies, $config, isDev, req
 }) {
   $axios.defaults.headers.common['Accept'] = 'application/json';
   $axios.defaults.withCredentials = true;
@@ -63,5 +63,18 @@ export default function({
 
     $axios.defaults.httpsAgent = insecureAgent;
     $axios.httpsAgent = insecureAgent;
+  }
+
+  if ($config.rancherEnv === 'desktop') {
+    $axios.interceptors.request.use((config) => {
+      if (!config.url.startsWith('http')) {
+        return config;
+      }
+
+      const url = new URL(config.url);
+      const urlTrimmed = config.url.replace(`${ url.origin }`, '');
+
+      return { ...config, url: urlTrimmed };
+    });
   }
 }
