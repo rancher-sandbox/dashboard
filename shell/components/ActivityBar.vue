@@ -16,7 +16,7 @@
       <div class="activity-icon">
         <span class="icon icon-2x icon-info"></span>
       </div>
-      <div class="activity-icon">
+      <div class="activity-icon active">
         <span class="icon icon-2x icon-warning"></span>
       </div>
     </div>
@@ -28,6 +28,11 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    background: #002C40 0% 0% no-repeat padding-box;
+    width: 4rem;
+    box-shadow: 4px 3px 6px #00000029;
+    opacity: 1;
+    z-index: 9;
 
     .menu {
       display: flex;
@@ -51,6 +56,12 @@
       justify-content: center;
 
       .activity-icon {
+        &.active {
+          border: 1px solid #0181BE;
+          background-color: #0181BE;
+          color: var(--darker-text)
+        }
+
         display: flex;
         align-items: center;
         justify-content: center;

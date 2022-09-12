@@ -765,10 +765,6 @@ export default {
 <style lang="scss" scoped>
   .activity-bar {
     grid-area: activity;
-    width: 4rem;
-    background: #002C40 0% 0% no-repeat padding-box;
-    box-shadow: 4px 3px 6px #00000029;
-    opacity: 1;
   }
 
   .side-nav {
