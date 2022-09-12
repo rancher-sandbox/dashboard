@@ -11,6 +11,7 @@ import PromptModal from '@shell/components/PromptModal';
 import AssignTo from '@shell/components/AssignTo';
 import Group from '@shell/components/nav/Group';
 import Header from '@shell/components/nav/Header';
+import ActivityBar from '@shell/components/ActivityBar';
 import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
 import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
@@ -47,7 +48,8 @@ export default {
     WindowManager,
     FixedBanner,
     AwsComplianceBanner,
-    AzureWarning
+    AzureWarning,
+    ActivityBar
   },
 
   mixins: [PageHeaderActions, Brand, BrowserTabVisibility],
@@ -579,6 +581,7 @@ export default {
     <AzureWarning v-if="managementReady" />
     <div v-if="managementReady" class="dashboard-content">
       <Header />
+      <activity-bar class="activity-bar" />
       <nav v-if="clusterReady" class="side-nav">
         <div class="nav">
           <template v-for="(g) in groups">
@@ -673,6 +676,14 @@ export default {
   </div>
 </template>
 <style lang="scss" scoped>
+  .activity-bar {
+    grid-area: activity;
+    width: 4rem;
+    background: #002C40 0% 0% no-repeat padding-box;
+    box-shadow: 4px 3px 6px #00000029;
+    opacity: 1;
+  }
+
   .side-nav {
     display: flex;
     flex-direction: column;
@@ -698,11 +709,11 @@ export default {
     min-height: 0px;
 
     grid-template-areas:
-      "header  header"
-      "nav      main"
-      "wm       wm";
+      "activity header header"
+      "activity nav main"
+      "activity wm wm";
 
-    grid-template-columns: var(--nav-width)     auto;
+    grid-template-columns: min-content var(--nav-width)     auto;
     grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
 
     > HEADER {
