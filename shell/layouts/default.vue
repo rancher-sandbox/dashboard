@@ -16,6 +16,7 @@ import PromptModal from '@shell/components/PromptModal';
 import AssignTo from '@shell/components/AssignTo';
 import Group from '@shell/components/nav/Group';
 import Header from '@shell/components/nav/Header';
+import ActivityBar from '@shell/components/ActivityBar';
 import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
 import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
@@ -56,6 +57,7 @@ export default {
     AwsComplianceBanner,
     AzureWarning,
     DraggableZone,
+    ActivityBar,
   },
 
   mixins: [PageHeaderActions, Brand, BrowserTabVisibility],
@@ -611,6 +613,7 @@ export default {
       :class="{[pinClass]: true}"
     >
       <Header />
+      <activity-bar class="activity-bar" />
       <nav
         v-if="clusterReady"
         class="side-nav"
@@ -760,6 +763,14 @@ export default {
   </div>
 </template>
 <style lang="scss" scoped>
+  .activity-bar {
+    grid-area: activity;
+    width: 4rem;
+    background: #002C40 0% 0% no-repeat padding-box;
+    box-shadow: 4px 3px 6px #00000029;
+    opacity: 1;
+  }
+
   .side-nav {
     display: flex;
     flex-direction: column;
@@ -786,27 +797,27 @@ export default {
 
     &.pin-right {
       grid-template-areas:
-        "header  header  header"
-        "nav      main     wm";
+        "activity header  header  header"
+        "activity nav      main     wm";
       grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: var(--nav-width)     auto var(--wm-width, 0px);
+      grid-template-columns: min-content var(--nav-width)     auto var(--wm-width, 0px);
     }
 
     &.pin-bottom {
       grid-template-areas:
-        "header  header"
-        "nav       main"
-        "wm         wm";
+        "activity header  header"
+        "activity nav       main"
+        "activity wm         wm";
       grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
-      grid-template-columns: var(--nav-width)     auto;
+      grid-template-columns: min-content var(--nav-width)     auto;
     }
 
     &.pin-left {
       grid-template-areas:
-        "header  header  header"
-        "wm       nav     main";
+        "activity header  header  header"
+        "activity wm       nav     main";
       grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: var(--wm-width, 0px) var(--nav-width) auto;
+      grid-template-columns: min-content var(--wm-width, 0px) var(--nav-width) auto;
     }
 
     > HEADER {
