@@ -4,14 +4,28 @@ export default Vue.extend({
   name: 'ActivityBar',
   data() {
     return { isExpanded: true };
-  }
+  },
+  methods: {
+    menuClick() {
+      this.isExpanded = !this.isExpanded;
+    }
+  },
 });
 </script>
 
 <template>
-  <div class="activity-bar">
+  <div
+    class="activity-bar"
+    :class="{
+      'activity-bar-expanded': isExpanded,
+      'activity-bar-collapsed': !isExpanded
+    }"
+  >
     <div class="menu">
-      <div class="menu-container">
+      <div
+        class="menu-container"
+        @click="menuClick"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"
@@ -46,11 +60,18 @@ export default Vue.extend({
     flex-direction: column;
     align-items: stretch;
     background: #002C40 0% 0% no-repeat padding-box;
-    width: 16rem;
     box-shadow: 4px 3px 6px #00000029;
     opacity: 1;
     z-index: 9;
     padding-left: 0.75rem;
+
+    &.activity-bar-expanded {
+      width: 16rem;
+    }
+
+    &.activity-bar-collapsed {
+      width: 4rem;
+    }
 
     .menu {
       display: flex;
