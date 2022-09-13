@@ -42,13 +42,19 @@ export default Vue.extend({
         <div class="activity-icon">
           <span class="icon icon-2x icon-info"></span>
         </div>
-        <span v-if="isExpanded">Rancher Desktop</span>
+        <span
+          v-if="isExpanded"
+          class="activity-text"
+        >Rancher Desktop</span>
       </div>
       <div class="activity">
         <div class="activity-icon active">
           <span class="icon icon-2x icon-warning"></span>
         </div>
-        <span v-if="isExpanded">Dashboard</span>
+        <span
+          v-if="isExpanded"
+          class="activity-text"
+        >Dashboard</span>
       </div>
     </div>
   </div>
@@ -64,13 +70,16 @@ export default Vue.extend({
     opacity: 1;
     z-index: 99;
     padding: 0 0.75rem;
+    width: 100%;
+    transition: width 0.25s ease;
+    overflow: hidden;
 
     &.activity-bar-expanded {
       width: 16rem;
     }
 
     &.activity-bar-collapsed {
-      width: initial;
+      width: 100%;
     }
 
     .menu {
@@ -108,6 +117,10 @@ export default Vue.extend({
         gap: 1rem;
         align-items: center;
         cursor: pointer;
+
+        .activity-text {
+          flex-shrink: 0;
+        }
 
         .activity-icon {
           &.active {
