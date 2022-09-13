@@ -62,15 +62,15 @@ export default Vue.extend({
     background: #002C40 0% 0% no-repeat padding-box;
     box-shadow: 4px 3px 6px #00000029;
     opacity: 1;
-    z-index: 9;
-    padding-left: 0.75rem;
+    z-index: 99;
+    padding: 0 0.75rem;
 
     &.activity-bar-expanded {
       width: 16rem;
     }
 
     &.activity-bar-collapsed {
-      width: 4rem;
+      width: initial;
     }
 
     .menu {

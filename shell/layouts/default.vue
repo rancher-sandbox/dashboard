@@ -709,7 +709,7 @@ export default {
       "activity nav main"
       "activity wm wm";
 
-    grid-template-columns: min-content var(--nav-width)     auto;
+    grid-template-columns: max(57px) var(--nav-width)     auto;
     grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
 
     > HEADER {
