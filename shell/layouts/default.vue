@@ -796,7 +796,7 @@ export default {
         "activity header  header  header"
         "activity nav      main     wm";
       grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: min-content var(--nav-width)     auto var(--wm-width, 0px);
+      grid-template-columns: max(57px) min-content var(--nav-width)     auto var(--wm-width, 0px);
     }
 
     &.pin-bottom {
@@ -805,7 +805,7 @@ export default {
         "activity nav       main"
         "activity wm         wm";
       grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
-      grid-template-columns: min-content var(--nav-width)     auto;
+      grid-template-columns: max(57px) var(--nav-width)     auto;
     }
 
     &.pin-left {
@@ -813,7 +813,7 @@ export default {
         "activity header  header  header"
         "activity wm       nav     main";
       grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: min-content var(--wm-width, 0px) var(--nav-width) auto;
+      grid-template-columns: max(57px) var(--wm-width, 0px) var(--nav-width) auto;
     }
 
     > HEADER {
