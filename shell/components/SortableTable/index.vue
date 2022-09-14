@@ -370,11 +370,14 @@ export default {
     },
 
     // Ensure we update live and delayed columns on first load
-    initalLoad(neu, old) {
-      if (neu && !old) {
-        this._didinit = true;
-        this.$nextTick(() => this.updateLiveAndDelayed());
-      }
+    initalLoad: {
+      handler(neu) {
+        if (neu) {
+          this._didinit = true;
+          this.$nextTick(() => this.updateLiveAndDelayed());
+        }
+      },
+      immediate: true
     },
 
     isManualRefreshLoading(neu, old) {
@@ -400,7 +403,7 @@ export default {
     },
 
     initalLoad() {
-      return !this.loading && !this._didinit && this.rows?.length;
+      return !!(!this.loading && !this._didinit && this.rows?.length);
     },
 
     fullColspan() {
@@ -863,7 +866,7 @@ export default {
                 <template #button-content>
                   <button ref="actionDropDown" class="btn bg-primary mr-0" :disabled="!selectedRows.length">
                     <i class="icon icon-gear" />
-                    <span>{{ t('harvester.tableHeaders.actions') }}</span>
+                    <span>{{ t('sortableTable.bulkActions.collapsed.label') }}</span>
                     <i class="ml-10 icon icon-chevron-down" />
                   </button>
                 </template>
