@@ -579,9 +579,19 @@ export default {
     <FixedBanner :header="true" />
     <AwsComplianceBanner v-if="managementReady" />
     <AzureWarning v-if="managementReady" />
-    <div v-if="managementReady" class="dashboard-content">
+    <div
+      v-if="managementReady"
+      class="dashboard-content"
+      :class="{
+        'dashboard-content-grid': !featureRancherDesktop,
+        'desktop-content-grid': featureRancherDesktop
+      }"
+    >
       <Header />
-      <activity-bar class="activity-bar" />
+      <activity-bar
+        v-if="featureRancherDesktop"
+        class="activity-bar"
+      />
       <nav v-if="clusterReady" class="side-nav">
         <div class="nav">
           <template v-for="(g) in groups">
@@ -697,13 +707,17 @@ export default {
     height: 100vh;
   }
 
-  .dashboard-content {
-    display: grid;
-    position: relative;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0px;
+  .dashboard-content-grid {
+    grid-template-areas:
+      "header header"
+      "nav main"
+      "wm wm";
 
+    grid-template-columns: var(--nav-width)     auto;
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+  }
+
+  .desktop-content-grid {
     grid-template-areas:
       "activity header header"
       "activity nav main"
@@ -711,6 +725,14 @@ export default {
 
     grid-template-columns: max(57px) var(--nav-width)     auto;
     grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+  }
+
+  .dashboard-content {
+    display: grid;
+    position: relative;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0px;
 
     > HEADER {
       grid-area: header;
