@@ -610,6 +610,8 @@ export default {
     <div
       v-if="managementReady"
       class="dashboard-content"
+      <<<<<<<
+      HEAD
       :class="{[pinClass]: true}"
     >
       <Header />
@@ -618,144 +620,161 @@ export default {
         v-if="clusterReady"
         class="side-nav"
       >
-        <div class="nav">
-          <template v-for="(g) in groups">
-            <Group
-              ref="groups"
-              :key="g.name"
-              id-prefix=""
-              class="package"
-              :group="g"
-              :can-collapse="!g.isRoot"
-              :show-header="!g.isRoot"
-              @selected="groupSelected($event)"
-              @expand="groupSelected($event)"
-            />
-          </template>
-        </div>
-        <n-link
-          v-if="showClusterTools"
-          tag="div"
-          class="tools"
-          :to="{name: 'c-cluster-explorer-tools', params: {cluster: clusterId}}"
+        =======
+        :class="{
+        'dashboard-content-grid': !featureRancherDesktop,
+        'desktop-content-grid': featureRancherDesktop
+        }"
         >
-          <a
-            class="tools-button"
-            @click="collapseAll()"
-          >
-            <i class="icon icon-gear" />
-            <span>{{ t('nav.clusterTools') }}</span>
-          </a>
-        </n-link>
-        <div
-          v-if="showProductFooter"
-          class="footer"
+        <Header />
+        <activity-bar
+          v-if="featureRancherDesktop"
+          class="activity-bar"
+        />
+        <nav
+          v-if="clusterReady"
+          class="side-nav"
         >
-          <nuxt-link
-            :to="supportLink"
-            class="pull-right"
+          >>>>>>> 4391d6ed4 (Toggle activity bar based on environment)
+          <div class="nav">
+            <template v-for="(g) in groups">
+              <Group
+                ref="groups"
+                :key="g.name"
+                id-prefix=""
+                class="package"
+                :group="g"
+                :can-collapse="!g.isRoot"
+                :show-header="!g.isRoot"
+                @selected="groupSelected($event)"
+                @expand="groupSelected($event)"
+              />
+            </template>
+          </div>
+          <n-link
+            v-if="showClusterTools"
+            tag="div"
+            class="tools"
+            :to="{name: 'c-cluster-explorer-tools', params: {cluster: clusterId}}"
           >
-            {{ t('nav.support', {hasSupport: true}) }}
-          </nuxt-link>
+            <a
+              class="tools-button"
+              @click="collapseAll()"
+            >
+              <i class="icon icon-gear" />
+              <span>{{ t('nav.clusterTools') }}</span>
+            </a>
+          </n-link>
+          <div
+            v-if="showProductFooter"
+            class="footer"
+          >
+            <nuxt-link
+              :to="supportLink"
+              class="pull-right"
+            >
+              {{ t('nav.support', {hasSupport: true}) }}
+            </nuxt-link>
 
-          <span
-            v-tooltip="{content: displayVersion, placement: 'top'}"
-            class="clip version text-muted"
+            <span
+              v-tooltip="{content: displayVersion, placement: 'top'}"
+              class="clip version text-muted"
+            >
+              {{ displayVersion }}
+            </span>
+
+            <span v-if="isSingleProduct">
+              <v-popover
+                popover-class="localeSelector"
+                placement="top"
+                trigger="click"
+              >
+                <a
+                  data-testid="locale-selector"
+                  class="locale-chooser"
+                >
+                  {{ locale }}
+                </a>
+
+                <template slot="popover">
+                  <ul
+                    class="list-unstyled dropdown"
+                    style="margin: -1px;"
+                  >
+                    <li
+                      v-for="(label, name) in availableLocales"
+                      :key="name"
+                      class="hand"
+                      @click="switchLocale(name)"
+                    >
+                      {{ label }}
+                    </li>
+                  </ul>
+                </template>
+              </v-popover>
+            </span>
+          </div>
+          <div
+            v-else
+            class="version text-muted"
           >
             {{ displayVersion }}
-          </span>
-
-          <span v-if="isSingleProduct">
-            <v-popover
-              popover-class="localeSelector"
-              placement="top"
-              trigger="click"
-            >
-              <a
-                data-testid="locale-selector"
-                class="locale-chooser"
-              >
-                {{ locale }}
-              </a>
-
-              <template slot="popover">
-                <ul
-                  class="list-unstyled dropdown"
-                  style="margin: -1px;"
-                >
-                  <li
-                    v-for="(label, name) in availableLocales"
-                    :key="name"
-                    class="hand"
-                    @click="switchLocale(name)"
-                  >
-                    {{ label }}
-                  </li>
-                </ul>
-              </template>
-            </v-popover>
-          </span>
-        </div>
-        <div
-          v-else
-          class="version text-muted"
+          </div>
+        </nav>
+        <main
+          v-if="clusterAndRouteReady"
+          class="main-layout"
         >
-          {{ displayVersion }}
+          <nuxt class="outlet" />
+          <ActionMenu />
+          <PromptRemove />
+          <PromptRestore />
+          <AssignTo />
+          <PromptModal />
+          <button
+            v-if="noLocaleShortcut"
+            v-shortkey.once="['shift','l']"
+            class="hide"
+            @shortkey="toggleNoneLocale()"
+          />
+          <button
+            v-if="themeShortcut"
+            v-shortkey.once="['shift','t']"
+            class="hide"
+            @shortkey="toggleTheme()"
+          />
+          <button
+            v-shortkey.once="['f8']"
+            class="hide"
+            @shortkey="wheresMyDebugger()"
+          />
+          <button
+            v-shortkey.once="['`']"
+            class="hide"
+            @shortkey="toggleShell"
+          />
+        </main>
+        <!-- Ensure there's an outlet to show the error (404) page -->
+        <main
+          v-else-if="unmatchedRoute"
+          class="main-layout"
+        >
+          <nuxt class="outlet" />
+        </main>
+        <div
+          v-if="$refs.draggableZone"
+          class="wm"
+          :class="{
+            'drag-end': !$refs.draggableZone.drag.active,
+            'drag-start': $refs.draggableZone.drag.active,
+          }"
+          draggable="true"
+          @dragstart="$refs.draggableZone.onDragStart($event)"
+          @dragend="$refs.draggableZone.onDragEnd($event)"
+        >
+          <WindowManager />
         </div>
       </nav>
-      <main
-        v-if="clusterAndRouteReady"
-        class="main-layout"
-      >
-        <nuxt class="outlet" />
-        <ActionMenu />
-        <PromptRemove />
-        <PromptRestore />
-        <AssignTo />
-        <PromptModal />
-        <button
-          v-if="noLocaleShortcut"
-          v-shortkey.once="['shift','l']"
-          class="hide"
-          @shortkey="toggleNoneLocale()"
-        />
-        <button
-          v-if="themeShortcut"
-          v-shortkey.once="['shift','t']"
-          class="hide"
-          @shortkey="toggleTheme()"
-        />
-        <button
-          v-shortkey.once="['f8']"
-          class="hide"
-          @shortkey="wheresMyDebugger()"
-        />
-        <button
-          v-shortkey.once="['`']"
-          class="hide"
-          @shortkey="toggleShell"
-        />
-      </main>
-      <!-- Ensure there's an outlet to show the error (404) page -->
-      <main
-        v-else-if="unmatchedRoute"
-        class="main-layout"
-      >
-        <nuxt class="outlet" />
-      </main>
-      <div
-        v-if="$refs.draggableZone"
-        class="wm"
-        :class="{
-          'drag-end': !$refs.draggableZone.drag.active,
-          'drag-start': $refs.draggableZone.drag.active,
-        }"
-        draggable="true"
-        @dragstart="$refs.draggableZone.onDragStart($event)"
-        @dragend="$refs.draggableZone.onDragEnd($event)"
-      >
-        <WindowManager />
-      </div>
     </div>
     <FixedBanner :footer="true" />
     <GrowlManager />
@@ -784,19 +803,45 @@ export default {
     height: 100vh;
   }
 
-  .dashboard-content {
-    display: grid;
-    position: relative;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0px;
+  .dashboard-content-grid {
+    grid-template-areas:
+      "header header"
+      "nav main"
+      "wm wm";
 
+    &.pin-right {
+      grid-template-areas:
+        "header  header  header"
+        "nav      main     wm";
+      grid-template-rows:    var(--header-height) auto;
+      grid-template-columns: min-content var(--nav-width)     auto var(--wm-width, 0px);
+    }
+
+    &.pin-bottom {
+      grid-template-areas:
+        "header  header"
+        "nav       main"
+        "wm         wm";
+      grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+      grid-template-columns: var(--nav-width)     auto;
+    }
+
+    &.pin-left {
+      grid-template-areas:
+        "header  header  header"
+        "wm       nav     main";
+      grid-template-rows:    var(--header-height) auto;
+      grid-template-columns: var(--wm-width, 0px) var(--nav-width) auto;
+    }
+  }
+
+  .desktop-content-grid {
     &.pin-right {
       grid-template-areas:
         "activity header  header  header"
         "activity nav      main     wm";
       grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: max(57px) min-content var(--nav-width)     auto var(--wm-width, 0px);
+      grid-template-columns: max(57px) var(--nav-width)     auto var(--wm-width, 0px);
     }
 
     &.pin-bottom {
@@ -815,6 +860,17 @@ export default {
       grid-template-rows:    var(--header-height) auto;
       grid-template-columns: max(57px) var(--wm-width, 0px) var(--nav-width) auto;
     }
+
+    grid-template-columns: max(57px) var(--nav-width)     auto;
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+  }
+
+  .dashboard-content {
+    display: grid;
+    position: relative;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0px;
 
     > HEADER {
       grid-area: header;
