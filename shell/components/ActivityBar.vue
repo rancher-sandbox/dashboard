@@ -3,7 +3,7 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'ActivityBar',
   data() {
-    return { isExpanded: true };
+    return { isExpanded: false };
   },
   methods: {
     menuClick() {
@@ -53,7 +53,7 @@ export default Vue.extend({
         </div>
         <span
           v-if="isExpanded"
-          class="activity-text"
+          class="activity-text active"
         >Dashboard</span>
       </div>
     </div>
@@ -65,7 +65,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    background: #002C40 0% 0% no-repeat padding-box;
+    background: var(--primary-900) 0% 0% no-repeat padding-box;
     box-shadow: 4px 3px 6px #00000029;
     opacity: 1;
     z-index: 99;
@@ -113,20 +113,35 @@ export default Vue.extend({
 
       .activity {
         display: flex;
-        color: var(--darker-text);
         gap: 1rem;
         align-items: center;
         cursor: pointer;
 
+        &:hover {
+          .activity-icon {
+            color: var(--primary-hover-text);
+            border-color: var(--primary-hover-text);
+          }
+
+          .activity-text {
+            color: var(--primary-hover-text);
+          }
+        }
+
         .activity-text {
+          color: #BCBCBC;
           flex-shrink: 0;
+
+          &.active {
+            color: var(--darker-text);
+          }
         }
 
         .activity-icon {
           &.active {
-            border: 1px solid #0181BE;
-            background-color: #0181BE;
-            color: var(--darker-text);
+            border: 1px solid var(--activity-icon-active-background);
+            background-color: var(--activity-icon-active-background);
+            color: var(--activity-icon-color);
           }
 
           display: flex;
