@@ -11,6 +11,7 @@ import PromptModal from '@shell/components/PromptModal';
 import AssignTo from '@shell/components/AssignTo';
 import Group from '@shell/components/nav/Group';
 import Header from '@shell/components/nav/Header';
+import ActivityBar from '@shell/components/ActivityBar';
 import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
 import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
@@ -47,7 +48,8 @@ export default {
     WindowManager,
     FixedBanner,
     AwsComplianceBanner,
-    AzureWarning
+    AzureWarning,
+    ActivityBar
   },
 
   mixins: [PageHeaderActions, Brand, BrowserTabVisibility],
@@ -577,8 +579,19 @@ export default {
     <FixedBanner :header="true" />
     <AwsComplianceBanner v-if="managementReady" />
     <AzureWarning v-if="managementReady" />
-    <div v-if="managementReady" class="dashboard-content">
+    <div
+      v-if="managementReady"
+      class="dashboard-content"
+      :class="{
+        'dashboard-content-grid': !featureRancherDesktop,
+        'desktop-content-grid': featureRancherDesktop
+      }"
+    >
       <Header />
+      <activity-bar
+        v-if="featureRancherDesktop"
+        class="activity-bar"
+      />
       <nav v-if="clusterReady" class="side-nav">
         <div class="nav">
           <template v-for="(g) in groups">
@@ -673,6 +686,10 @@ export default {
   </div>
 </template>
 <style lang="scss" scoped>
+  .activity-bar {
+    grid-area: activity;
+  }
+
   .side-nav {
     display: flex;
     flex-direction: column;
@@ -690,20 +707,32 @@ export default {
     height: 100vh;
   }
 
+  .dashboard-content-grid {
+    grid-template-areas:
+      "header header"
+      "nav main"
+      "wm wm";
+
+    grid-template-columns: var(--nav-width)     auto;
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+  }
+
+  .desktop-content-grid {
+    grid-template-areas:
+      "activity header header"
+      "activity nav main"
+      "activity wm wm";
+
+    grid-template-columns: max(57px) var(--nav-width)     auto;
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+  }
+
   .dashboard-content {
     display: grid;
     position: relative;
     flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0px;
-
-    grid-template-areas:
-      "header  header"
-      "nav      main"
-      "wm       wm";
-
-    grid-template-columns: var(--nav-width)     auto;
-    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
 
     > HEADER {
       grid-area: header;
