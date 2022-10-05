@@ -1,4 +1,5 @@
 <script>
+import isEqual from 'lodash/isEqual';
 import Loading from '@shell/components/Loading';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import CruResource from '@shell/components/CruResource';
@@ -76,6 +77,8 @@ export default {
   data() {
     return {
       endpoint:          'standard',
+      oldEndpoint:        false,
+
       // Storing the applicationSecret is necessary because norman doesn't support returning secrets and when we
       // override the steve authconfig with a norman config the applicationSecret is lost
       applicationSecret: this.value.applicationSecret
@@ -147,9 +150,6 @@ export default {
       handler() {
         this.model.accessMode = this.model.accessMode || 'unrestricted';
         this.model.rancherUrl = this.model.rancherUrl || this.replyUrl;
-        if (this.endpoint !== 'custom') {
-          this.setEndpoints(this.endpoint);
-        }
 
         if (this.model.applicationSecret) {
           this.$set(this, 'applicationSecret', this.model.applicationSecret);
@@ -162,11 +162,13 @@ export default {
   methods: {
     setEndpoints(endpoint) {
       if (this.editConfig || !this.model.enabled) {
-        Object.keys(ENDPOINT_MAPPING[endpoint]).forEach((key) => {
+        const endpointType = this.oldEndpoint && endpoint !== 'custom' ? OLD_ENDPOINTS : ENDPOINT_MAPPING;
+
+        Object.keys(endpointType[endpoint]).forEach((key) => {
           this.$set(
             this.model,
             key,
-            ENDPOINT_MAPPING[endpoint][key].replace(
+            endpointType[endpoint][key].replace(
               TENANT_ID_TOKEN,
               this.model.tenantId
             )
@@ -176,13 +178,32 @@ export default {
     },
 
     setInitialEndpoint(endpoint) {
-      const endpointKey = Object.keys(ENDPOINT_MAPPING).find(key => ENDPOINT_MAPPING[key].graphEndpoint === endpoint);
+      const newEndpointKey = this.determineEndpointKeyType(ENDPOINT_MAPPING);
+      const oldEndpointKey = Object.keys(OLD_ENDPOINTS).find(key => OLD_ENDPOINTS[key].graphEndpoint === endpoint);
 
-      if ( endpointKey ) {
-        this.endpoint = endpointKey;
+      if ( oldEndpointKey ) {
+        this.endpoint = oldEndpointKey;
+        this.oldEndpoint = true;
+      } else if ( newEndpointKey ) {
+        this.endpoint = newEndpointKey;
       } else {
         this.endpoint = 'custom';
       }
+    },
+
+    determineEndpointKeyType(endpointTypes) {
+      let out = 'custom';
+
+      for ( const [endpointKey, endpointKeyValues] of Object.entries(endpointTypes) ) {
+        const mappedValues = Object.values(endpointKeyValues).map(endpoint => endpoint.replace(TENANT_ID_TOKEN, this.model?.tenantId));
+        const valuesToCheck = Object.keys(endpointKeyValues).map(key => this.value[key]);
+
+        if ( isEqual(mappedValues, valuesToCheck) ) {
+          out = endpointKey;
+        }
+      }
+
+      return out;
     },
 
     getNewApplicationSecret() {

@@ -1,11 +1,10 @@
 <script>
 import BrandImage from '@shell/components/BrandImage';
 import ClusterProviderIcon from '@shell/components/ClusterProviderIcon';
-import LocaleSelector from '@shell/components/LocaleSelector';
 import { mapGetters } from 'vuex';
 import $ from 'jquery';
 import { CAPI, MANAGEMENT } from '@shell/config/types';
-import { mapPref, DEV, MENU_MAX_CLUSTERS } from '@shell/store/prefs';
+import { mapPref, MENU_MAX_CLUSTERS } from '@shell/store/prefs';
 import { sortBy } from '@shell/utils/sort';
 import { ucFirst } from '@shell/utils/string';
 import { KEY } from '@shell/utils/platform';
@@ -20,9 +19,7 @@ const UI_COMMIT = process.env.COMMIT || UNKNOWN;
 
 export default {
 
-  components: {
-    BrandImage, ClusterProviderIcon, LocaleSelector
-  },
+  components: { BrandImage, ClusterProviderIcon },
 
   data() {
     const { displayVersion, fullVersion } = getVersionInfo(this.$store);
@@ -68,9 +65,10 @@ export default {
     clusters() {
       const all = this.$store.getters['management/all'](MANAGEMENT.CLUSTER);
       let kubeClusters = filterHiddenLocalCluster(filterOnlyKubernetesClusters(all), this.$store);
+      let pClusters = null;
 
       if (this.hasProvCluster) {
-        const pClusters = this.$store.getters['management/all'](CAPI.RANCHER_CLUSTER);
+        pClusters = this.$store.getters['management/all'](CAPI.RANCHER_CLUSTER);
         const available = pClusters.reduce((p, c) => {
           p[c.mgmt] = true;
 
@@ -84,10 +82,12 @@ export default {
       }
 
       return kubeClusters.map((x) => {
+        const pCluster = pClusters?.find(c => c.mgmt.id === x.id);
+
         return {
           id:              x.id,
           label:           x.nameDisplay,
-          ready:           x.isReady,
+          ready:           x.isReady && !pCluster?.hasError,
           osLogo:          x.providerOsLogo,
           providerNavLogo: x.providerMenuLogo,
           badge:           x.badge,
@@ -101,12 +101,10 @@ export default {
 
       const out = search ? this.clusters.filter(item => item.label.toLowerCase().includes(search)) : this.clusters;
 
-      const sorted = sortBy(out, ['ready:desc', 'label']);
+      const sorted = sortBy(out, ['name:desc', 'label']);
 
       return sorted;
     },
-
-    dev: mapPref(DEV),
 
     maxClustersToShow: mapPref(MENU_MAX_CLUSTERS),
 
@@ -125,22 +123,7 @@ export default {
     configurationApps() {
       const options = this.options;
 
-      const items = options.filter(opt => opt.category === 'configuration');
-
-      // Add plugin page
-      // Ony when developing for now
-      if (process.env.dev) {
-        items.push({
-          label:   'Plugins',
-          inStore: 'management',
-          icon:    'icon-gear',
-          value:   'plugins',
-          weight:  1,
-          to:      { name: 'plugins' },
-        });
-      }
-
-      return items;
+      return options.filter(opt => opt.category === 'configuration');
     },
 
     options() {
@@ -190,7 +173,7 @@ export default {
   watch: {
     $route() {
       this.shown = false;
-    },
+    }
   },
 
   mounted() {
@@ -353,7 +336,6 @@ export default {
               v-html="displayVersion"
             />
           </div>
-          <LocaleSelector></LocaleSelector>
         </div>
       </div>
     </transition>

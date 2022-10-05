@@ -197,12 +197,10 @@ export default class ProvCluster extends SteveModel {
     return super.canEditYaml;
   }
 
-  get isAKS() {
-    return this.provisioner === 'AKS';
-  }
+  get isHostedKubernetesProvider() {
+    const providers = ['AKS', 'EKS', 'GKE'];
 
-  get isEKS() {
-    return this.provisioner === 'EKS';
+    return providers.includes(this.provisioner);
   }
 
   get isImported() {
@@ -230,11 +228,15 @@ export default class ProvCluster extends SteveModel {
   get isImportedK3s() {
     // As of Rancher v2.6.7, this returns false for imported K3s clusters,
     // in which this.provisioner is `k3s`.
-    return this.isImported && this.mgmt?.status?.provider === 'k3s';
+    return this.isImported && this.isK3s;
   }
 
   get isImportedRke2() {
     return this.isImported && this.mgmt?.status?.provider?.startsWith('rke2');
+  }
+
+  get isK3s() {
+    return this.mgmt?.status?.provider === 'k3s';
   }
 
   get isRke2() {
@@ -763,5 +765,9 @@ export default class ProvCluster extends SteveModel {
     if ( res?._status === 204 ) {
       await this.$dispatch('ws.resource.remove', { data: this });
     }
+  }
+
+  get hasError() {
+    return this.status?.conditions?.some(condition => condition.error === true);
   }
 }

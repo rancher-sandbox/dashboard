@@ -170,8 +170,10 @@ export default {
           };
         });
 
-        (res.namespaces.value.data || []).forEach((namespace) => {
-          if (!namespace.isSystem) {
+        (res.namespaces.value.data || []).forEach(async(namespace) => {
+          const proxyNamespace = await this.$store.dispatch('cluster/create', namespace);
+
+          if (!proxyNamespace.isSystem && namespace.links.update) {
             const value = namespace.metadata.name;
             const label = namespace.metadata.name;
 
@@ -519,7 +521,7 @@ export default {
             :options="imageOptions"
             :required="true"
             :searchable="true"
-            :disabled="disabledEdit"
+            :disabled="disabled"
             label-key="cluster.credential.harvester.image"
             :placeholder="t('cluster.harvester.machinePool.image.placeholder')"
             @on-open="onOpen"

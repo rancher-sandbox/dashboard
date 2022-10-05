@@ -90,6 +90,7 @@ BODY, .theme-light {
   --link-border             : #{$link};
   --link-banner-bg          : #{rgba($link, 0.15)};
   --link-light-bg           : #{rgba($link, 0.05)};
+ 
 
   
   .text-link {
@@ -121,6 +122,8 @@ BODY, .theme-light {
   --default-border             : #{$light};
   --default-banner-bg          : #{rgba($light, 0.15)};
   --default-light-bg           : #{rgba($light, 0.05)};
+  --slider-light-bg            : #{rgba($lightest, 1)};
+  --slider-light-bg-right      : #{rgba($lightest, 0)};
 
 
   .text-default {
