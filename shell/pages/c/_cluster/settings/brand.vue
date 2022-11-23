@@ -12,8 +12,7 @@ import { Banner } from '@components/Banner';
 import { allHash } from '@shell/utils/promise';
 import { MANAGEMENT } from '@shell/config/types';
 import { getVendor, setVendor } from '@shell/config/private-label';
-import { fetchOrCreateSetting } from '@shell/utils/settings';
-import { SETTING } from '@shell/config/settings';
+import { SETTING, fetchOrCreateSetting } from '@shell/config/settings';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 import { setFavIcon } from '@shell/utils/favicon';
 
@@ -326,10 +325,7 @@ export default {
         v-if="customizeColor"
         class="row mt-20 mb-20"
       >
-        <ColorInput
-          v-model="uiColor"
-          component-testid="primary"
-        />
+        <ColorInput v-model="uiColor" />
       </div>
 
       <h3 class="mt-40 mb-5 pb-0">
@@ -352,7 +348,6 @@ export default {
         <ColorInput
           v-model="uiLinkColor"
           class="col"
-          component-testid="link"
         />
         <span class="col link-example">
           <a>
@@ -370,7 +365,6 @@ export default {
     </template>
     <div v-if="mode === 'edit'">
       <AsyncButton
-        component-testid="branding-apply"
         class="pull-right mt-20"
         mode="apply"
         @click="save"

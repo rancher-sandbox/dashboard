@@ -33,11 +33,6 @@ export default {
       type:    Boolean,
       default: false
     },
-
-    useQueryParamsForSimpleFiltering: {
-      type:    Boolean,
-      default: false
-    }
   },
   async fetch() {
     const store = this.$store;
@@ -142,7 +137,6 @@ export default {
       :rows="users"
       :group-by="groupBy"
       :loading="loading"
-      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     />
   </div>
 </template>

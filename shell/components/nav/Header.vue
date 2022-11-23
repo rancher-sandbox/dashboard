@@ -109,19 +109,6 @@ export default {
       return !this.featureRancherDesktop;
     },
 
-    showFilter() {
-      // Some products won't have a current cluster
-      const validClusterOrProduct = this.currentCluster ||
-                 (this.currentProduct && this.currentProduct.customNamespaceFilter) ||
-                 (this.currentProduct && this.currentProduct.showWorkspaceSwitcher);
-      // Don't show if the header is in 'simple' mode
-      const notSimple = !this.simple;
-      // One of these must be enabled, otherwise t here's no component to show
-      const validFilterSettings = this.currentProduct.showNamespaceFilter || this.currentProduct.showWorkspaceSwitcher;
-
-      return validClusterOrProduct && notSimple && validFilterSettings;
-    },
-
     showNavigation() {
       return !this.featureRancherDesktop;
     },
@@ -298,29 +285,13 @@ export default {
 </script>
 
 <template>
-  <header
-    ref="header"
-  >
+  <header ref="header">
     <div class="rd-header-left">
       <div>
         <TopLevelMenu v-if="isMultiCluster || !isSingleProduct" />
       </div>
       <div
         v-if="showNavigation"
-        class="menu-spacer"
-        :class="{'isSingleProduct': isSingleProduct }"
-      >
-        <n-link
-          v-if="isSingleProduct"
-          :to="singleProductLogoRoute"
-        >
-          <img
-            class="side-menu-logo"
-            :src="isSingleProduct.logo"
-          >
-        </n-link>
-      </div>
-      <div
         class="menu-spacer"
         :class="{'isSingleProduct': isSingleProduct }"
       >
@@ -418,13 +389,11 @@ export default {
       </div>
     </div>
 
-    <div class="spacer" />
-
     <div class="rd-header-right">
       <component :is="navHeaderRight" />
 
       <div
-        v-if="showFilter"
+        v-if="(currentCluster || (currentProduct && currentProduct.customNamespaceFilter)) && !simple && (currentProduct.showNamespaceFilter || currentProduct.showWorkspaceSwitcher)"
         class="top"
       >
         <NamespaceFilter v-if="clusterReady && currentProduct && (currentProduct.showNamespaceFilter || isExplorer)" />

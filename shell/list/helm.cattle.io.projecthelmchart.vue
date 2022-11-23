@@ -30,11 +30,6 @@ export default {
       type:    Boolean,
       default: false
     },
-
-    useQueryParamsForSimpleFiltering: {
-      type:    Boolean,
-      default: false
-    }
   },
   async fetch() {
     this.projectHelmChartSchema = this.$store.getters['cluster/schemaFor'](HELM.PROJECTHELMCHART);
@@ -77,7 +72,7 @@ export default {
       :show-incremental-loading-indicator="incrementalLoadingIndicator"
       :load-resources="loadResources"
       :load-indeterminate="loadIndeterminate"
-      :is-creatable="canCreateProjectHelmChart"
+      is-creatable
     />
     <Banner
       color="info"
@@ -113,7 +108,6 @@ export default {
         :headers="headers"
         :schema="projectHelmChartSchema"
         :loading="loading"
-        :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
         key-field="_key"
         :groupable="false"
       />

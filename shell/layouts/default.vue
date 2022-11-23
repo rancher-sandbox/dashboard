@@ -36,8 +36,6 @@ import { sortBy } from '@shell/utils/sort';
 import PageHeaderActions from '@shell/mixins/page-actions';
 import BrowserTabVisibility from '@shell/mixins/browser-tab-visibility';
 import { getProductFromRoute } from '@shell/middleware/authenticated';
-import { BOTTOM } from '@shell/utils/position';
-import { DraggableZone } from '@components/Utils/DraggableZone';
 
 const SET_LOGIN_ACTION = 'set-as-login';
 
@@ -56,8 +54,7 @@ export default {
     FixedBanner,
     AwsComplianceBanner,
     AzureWarning,
-    DraggableZone,
-    ActivityBar,
+    ActivityBar
   },
 
   mixins: [PageHeaderActions, Brand, BrowserTabVisibility],
@@ -69,8 +66,6 @@ export default {
       groups:           [],
       gettingGroups:    false,
       wantNavSync:      false,
-      unwatchPin:       undefined,
-      wmPin:            null,
     };
   },
 
@@ -214,10 +209,6 @@ export default {
         this.currentProduct?.name === getProductFromRoute(this.$route);
     },
 
-    pinClass() {
-      return `pin-${ this.wmPin }`;
-    },
-
   },
 
   watch: {
@@ -326,18 +317,6 @@ export default {
   mounted() {
     // Sync the navigation tree on fresh load
     this.$nextTick(() => this.syncNav());
-
-    this.wmPin = window.localStorage.getItem('wm-pin') || BOTTOM;
-
-    // two-way binding this.wmPin <-> draggableZone.pin
-    this.$refs.draggableZone.pin = this.wmPin;
-    this.unwatchPin = this.$watch('$refs.draggableZone.pin', (pin) => {
-      this.wmPin = pin;
-    });
-  },
-
-  unmounted() {
-    this.unwatchPin();
   },
 
   methods: {
@@ -352,7 +331,6 @@ export default {
 
       await this.$store.dispatch('prefs/setLastVisited', route);
     },
-
     handlePageAction(action) {
       if (action.action === SET_LOGIN_ACTION) {
         this.afterLoginRoute = this.getLoginRoute();
@@ -610,175 +588,145 @@ export default {
     <div
       v-if="managementReady"
       class="dashboard-content"
-      <<<<<<<
-      HEAD
-      :class="{[pinClass]: true}"
+      :class="{
+        'dashboard-content-grid': !featureRancherDesktop,
+        'desktop-content-grid': featureRancherDesktop
+      }"
     >
       <Header />
-      <activity-bar class="activity-bar" />
+      <activity-bar
+        v-if="featureRancherDesktop"
+        class="activity-bar"
+      />
       <nav
         v-if="clusterReady"
         class="side-nav"
       >
-        =======
-        :class="{
-        'dashboard-content-grid': !featureRancherDesktop,
-        'desktop-content-grid': featureRancherDesktop
-        }"
+        <div class="nav">
+          <template v-for="(g) in groups">
+            <Group
+              ref="groups"
+              :key="g.name"
+              id-prefix=""
+              class="package"
+              :group="g"
+              :can-collapse="!g.isRoot"
+              :show-header="!g.isRoot"
+              @selected="groupSelected($event)"
+              @expand="groupSelected($event)"
+            />
+          </template>
+        </div>
+        <n-link
+          v-if="showClusterTools"
+          tag="div"
+          class="tools"
+          :to="{name: 'c-cluster-explorer-tools', params: {cluster: clusterId}}"
         >
-        <Header />
-        <activity-bar
-          v-if="featureRancherDesktop"
-          class="activity-bar"
-        />
-        <nav
-          v-if="clusterReady"
-          class="side-nav"
+          <a
+            class="tools-button"
+            @click="collapseAll()"
+          >
+            <i class="icon icon-gear" />
+            <span>{{ t('nav.clusterTools') }}</span>
+          </a>
+        </n-link>
+        <div
+          v-if="showProductFooter"
+          class="footer"
         >
-          >>>>>>> 4391d6ed4 (Toggle activity bar based on environment)
-          <div class="nav">
-            <template v-for="(g) in groups">
-              <Group
-                ref="groups"
-                :key="g.name"
-                id-prefix=""
-                class="package"
-                :group="g"
-                :can-collapse="!g.isRoot"
-                :show-header="!g.isRoot"
-                @selected="groupSelected($event)"
-                @expand="groupSelected($event)"
-              />
-            </template>
-          </div>
-          <n-link
-            v-if="showClusterTools"
-            tag="div"
-            class="tools"
-            :to="{name: 'c-cluster-explorer-tools', params: {cluster: clusterId}}"
+          <nuxt-link
+            :to="supportLink"
+            class="pull-right"
           >
-            <a
-              class="tools-button"
-              @click="collapseAll()"
-            >
-              <i class="icon icon-gear" />
-              <span>{{ t('nav.clusterTools') }}</span>
-            </a>
-          </n-link>
-          <div
-            v-if="showProductFooter"
-            class="footer"
-          >
-            <nuxt-link
-              :to="supportLink"
-              class="pull-right"
-            >
-              {{ t('nav.support', {hasSupport: true}) }}
-            </nuxt-link>
+            {{ t('nav.support', {hasSupport: true}) }}
+          </nuxt-link>
 
-            <span
-              v-tooltip="{content: displayVersion, placement: 'top'}"
-              class="clip version text-muted"
-            >
-              {{ displayVersion }}
-            </span>
-
-            <span v-if="isSingleProduct">
-              <v-popover
-                popover-class="localeSelector"
-                placement="top"
-                trigger="click"
-              >
-                <a
-                  data-testid="locale-selector"
-                  class="locale-chooser"
-                >
-                  {{ locale }}
-                </a>
-
-                <template slot="popover">
-                  <ul
-                    class="list-unstyled dropdown"
-                    style="margin: -1px;"
-                  >
-                    <li
-                      v-for="(label, name) in availableLocales"
-                      :key="name"
-                      class="hand"
-                      @click="switchLocale(name)"
-                    >
-                      {{ label }}
-                    </li>
-                  </ul>
-                </template>
-              </v-popover>
-            </span>
-          </div>
-          <div
-            v-else
-            class="version text-muted"
+          <span
+            v-tooltip="{content: displayVersion, placement: 'top'}"
+            class="clip version text-muted"
           >
             {{ displayVersion }}
-          </div>
-        </nav>
-        <main
-          v-if="clusterAndRouteReady"
-          class="main-layout"
-        >
-          <nuxt class="outlet" />
-          <ActionMenu />
-          <PromptRemove />
-          <PromptRestore />
-          <AssignTo />
-          <PromptModal />
-          <button
-            v-if="noLocaleShortcut"
-            v-shortkey.once="['shift','l']"
-            class="hide"
-            @shortkey="toggleNoneLocale()"
-          />
-          <button
-            v-if="themeShortcut"
-            v-shortkey.once="['shift','t']"
-            class="hide"
-            @shortkey="toggleTheme()"
-          />
-          <button
-            v-shortkey.once="['f8']"
-            class="hide"
-            @shortkey="wheresMyDebugger()"
-          />
-          <button
-            v-shortkey.once="['`']"
-            class="hide"
-            @shortkey="toggleShell"
-          />
-        </main>
-        <!-- Ensure there's an outlet to show the error (404) page -->
-        <main
-          v-else-if="unmatchedRoute"
-          class="main-layout"
-        >
-          <nuxt class="outlet" />
-        </main>
+          </span>
+
+          <span v-if="isSingleProduct">
+            <v-popover
+              popover-class="localeSelector"
+              placement="top"
+              trigger="click"
+            >
+              <a
+                data-testid="locale-selector"
+                class="locale-chooser"
+              >
+                {{ locale }}
+              </a>
+
+              <template slot="popover">
+                <ul
+                  class="list-unstyled dropdown"
+                  style="margin: -1px;"
+                >
+                  <li
+                    v-for="(label, name) in availableLocales"
+                    :key="name"
+                    class="hand"
+                    @click="switchLocale(name)"
+                  >
+                    {{ label }}
+                  </li>
+                </ul>
+              </template>
+            </v-popover>
+          </span>
+        </div>
         <div
-          v-if="$refs.draggableZone"
-          class="wm"
-          :class="{
-            'drag-end': !$refs.draggableZone.drag.active,
-            'drag-start': $refs.draggableZone.drag.active,
-          }"
-          draggable="true"
-          @dragstart="$refs.draggableZone.onDragStart($event)"
-          @dragend="$refs.draggableZone.onDragEnd($event)"
+          v-else
+          class="version text-muted"
         >
-          <WindowManager />
+          {{ displayVersion }}
         </div>
       </nav>
+      <main v-if="clusterAndRouteReady">
+        <nuxt class="outlet" />
+        <ActionMenu />
+        <PromptRemove />
+        <PromptRestore />
+        <AssignTo />
+        <PromptModal />
+        <button
+          v-if="noLocaleShortcut"
+          v-shortkey.once="['shift','l']"
+          class="hide"
+          @shortkey="toggleNoneLocale()"
+        />
+        <button
+          v-if="themeShortcut"
+          v-shortkey.once="['shift','t']"
+          class="hide"
+          @shortkey="toggleTheme()"
+        />
+        <button
+          v-shortkey.once="['f8']"
+          class="hide"
+          @shortkey="wheresMyDebugger()"
+        />
+        <button
+          v-shortkey.once="['`']"
+          class="hide"
+          @shortkey="toggleShell"
+        />
+      </main>
+      <!-- Ensure there's an outlet to show the error (404) page -->
+      <main v-else-if="unmatchedRoute">
+        <nuxt class="outlet" />
+      </main>
+      <div class="wm">
+        <WindowManager />
+      </div>
     </div>
     <FixedBanner :footer="true" />
     <GrowlManager />
-    <DraggableZone ref="draggableZone" />
   </div>
 </template>
 <style lang="scss" scoped>
@@ -797,7 +745,7 @@ export default {
 
 </style>
 <style lang="scss">
-  .dashboard-root {
+  .dashboard-root{
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -809,57 +757,15 @@ export default {
       "nav main"
       "wm wm";
 
-    &.pin-right {
-      grid-template-areas:
-        "header  header  header"
-        "nav      main     wm";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: min-content var(--nav-width)     auto var(--wm-width, 0px);
-    }
-
-    &.pin-bottom {
-      grid-template-areas:
-        "header  header"
-        "nav       main"
-        "wm         wm";
-      grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
-      grid-template-columns: var(--nav-width)     auto;
-    }
-
-    &.pin-left {
-      grid-template-areas:
-        "header  header  header"
-        "wm       nav     main";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: var(--wm-width, 0px) var(--nav-width) auto;
-    }
+    grid-template-columns: var(--nav-width)     auto;
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
   }
 
   .desktop-content-grid {
-    &.pin-right {
-      grid-template-areas:
-        "activity header  header  header"
-        "activity nav      main     wm";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: max(57px) var(--nav-width)     auto var(--wm-width, 0px);
-    }
-
-    &.pin-bottom {
-      grid-template-areas:
-        "activity header  header"
-        "activity nav       main"
-        "activity wm         wm";
-      grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
-      grid-template-columns: max(57px) var(--nav-width)     auto;
-    }
-
-    &.pin-left {
-      grid-template-areas:
-        "activity header  header  header"
-        "activity wm       nav     main";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: max(57px) var(--wm-width, 0px) var(--nav-width) auto;
-    }
+    grid-template-areas:
+      "activity header header"
+      "activity nav main"
+      "activity wm wm";
 
     grid-template-columns: max(57px) var(--nav-width)     auto;
     grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
@@ -962,6 +868,58 @@ export default {
     }
   }
 
+  MAIN {
+    grid-area: main;
+    overflow: auto;
+
+    .outlet {
+      display: flex;
+      flex-direction: column;
+      padding: $space-m;
+      min-height: 100%;
+    }
+
+    FOOTER {
+      background-color: var(--nav-bg);
+      height: var(--footer-height);
+    }
+
+    HEADER {
+      display: grid;
+      grid-template-areas:  "type-banner type-banner"
+                            "title actions"
+                            "state-banner state-banner";
+      grid-template-columns: auto auto;
+      margin-bottom: 20px;
+      align-content: center;
+      min-height: 48px;
+
+      .type-banner {
+        grid-area: type-banner;
+      }
+
+      .state-banner {
+        grid-area: state-banner;
+      }
+
+      .title {
+        grid-area: title;
+        align-self: center;
+      }
+
+      .actions-container {
+        grid-area: actions;
+        margin-left: 8px;
+        align-self: center;
+        text-align: right;
+      }
+
+      .role-multi-action {
+        padding: 0 $input-padding-sm;
+      }
+    }
+  }
+
   .wm {
     grid-area: wm;
     overflow-y: hidden;
@@ -990,15 +948,5 @@ export default {
         text-decoration: none;
       }
     }
-  }
-
-  .drag-start {
-    z-index: 1000;
-    opacity: 0.5;
-    transition: opacity .3s ease;
-  }
-
-  .drag-end {
-    opacity: 1;
   }
 </style>

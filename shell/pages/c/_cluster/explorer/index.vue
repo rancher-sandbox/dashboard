@@ -402,7 +402,7 @@ export default {
 
 <template>
   <section class="dashboard">
-    <header class="header-layout">
+    <header>
       <div class="title">
         <h1>
           <t k="clusterIndexPage.header" />
@@ -468,7 +468,10 @@ export default {
         <n-link
           :to="{name: 'c-cluster-explorer-tools'}"
           class="monitoring-install"
-        />
+        >
+          <i class="icon icon-gear" />
+          <span>{{ t('glance.installMonitoring') }}</span>
+        </n-link>
       </div>
       <div v-if="monitoringStatus.v1">
         <span>{{ t('glance.v1MonitoringInstalled') }}</span>

@@ -168,10 +168,6 @@ export default {
       return "kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}{{\"\\n\"}}'";
     },
 
-    hasLoginMessage() {
-      return this.errorToDisplay || this.loggedOut || this.timedOut;
-    }
-
   },
 
   created() {
@@ -227,10 +223,6 @@ export default {
           elem.select();
         }
       }
-    },
-
-    handleProviderError(err) {
-      this.err = err;
     },
 
     async loginLocal(buttonCb) {
@@ -292,19 +284,16 @@ export default {
 </script>
 
 <template>
-  <main class="main-layout login">
+  <main class="login">
     <div class="row gutless mb-20">
       <div class="col span-6 p-20">
         <p class="text-center">
           {{ t('login.howdy') }}
         </p>
-        <h1 class="text-center login-welcome">
+        <h1 class="text-center">
           {{ t('login.welcome', {vendor}) }}
         </h1>
-        <div
-          class="login-messages"
-          :class="{'login-messages--hasContent': hasLoginMessage}"
-        >
+        <div class="login-messages">
           <Banner
             v-if="errorToDisplay"
             :label="errorToDisplay"
@@ -383,7 +372,7 @@ export default {
 
         <div
           v-if="(!hasLocal || (hasLocal && !showLocal)) && providers.length"
-          :class="{'mt-30': !hasLoginMessage}"
+          class="mt-30"
         >
           <component
             :is="providerComponents[idx]"
@@ -394,13 +383,12 @@ export default {
             :name="name"
             :open="!showLocal"
             @showInputs="showLocal = false"
-            @error="handleProviderError"
           />
         </div>
         <template v-if="hasLocal">
           <form
             v-if="showLocal"
-            :class="{'mt-30': !hasLoginMessage}"
+            class="mt-40"
           >
             <div class="span-6 offset-3">
               <div class="mb-20">
@@ -500,24 +488,6 @@ export default {
       height: 100vh;
       margin: 0;
       object-fit: cover;
-    }
-
-    .login-welcome {
-      margin: 0
-    }
-
-    .login-messages {
-      align-items: center;
-
-      .banner {
-        margin: 5px;
-      }
-      h4 {
-        margin: 0;
-      }
-      &--hasContent {
-        min-height: 70px;
-      }
     }
 
     .login-messages, .first-login-message {

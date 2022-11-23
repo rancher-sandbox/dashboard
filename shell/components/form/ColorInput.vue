@@ -29,15 +29,6 @@ export default {
         return [_EDIT, _VIEW].includes(value);
       },
       default: _EDIT,
-    },
-
-    /**
-     * Inherited global identifier prefix for tests
-     * Define a term based on the parent component to avoid conflicts on multiple components
-     */
-    componentTestid: {
-      type:    String,
-      default: 'color-input'
     }
   },
 
@@ -68,7 +59,6 @@ export default {
   <div
     class="color-input"
     :class="{[mode]:mode, disabled: mode !== editMode}"
-    :data-testid="componentTestid + '-color-input'"
   >
     <label class="text-label"><t
       v-if="labelKey"

@@ -27,7 +27,6 @@ export default defineConfig({
   projectId:             process.env.TEST_PROJECT_ID,
   defaultCommandTimeout: 60000,
   trashAssetsBeforeRuns: true,
-  retries:               2,
   env:                   {
     baseUrl,
     coverage:     false,

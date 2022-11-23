@@ -1,9 +1,6 @@
 <script>
 import { get } from '@shell/utils/object';
 import { BadgeState } from '@components/BadgeState';
-import { mapGetters } from 'vuex';
-
-const carouselSeenStorageKey = `carousel-seen`;
 
 export default {
   components: { BadgeState },
@@ -34,18 +31,16 @@ export default {
       default: 'noopener noreferrer nofollow'
     },
   },
-
   data() {
     return {
-      slider:                  this.sliders,
-      activeItemId:            0,
-      autoScroll:              true,
-      autoScrollSlideInterval: null,
+      slider:       this.sliders,
+      activeItemId: 0,
+      autoScroll:   true
     };
   },
 
   computed: {
-    ...mapGetters(['clusterId']),
+
     trackStyle() {
       const sliderItem = this.activeItemId * 100 / this.slider.length;
       const width = 60 * this.slider.length;
@@ -82,6 +77,9 @@ export default {
       this.slidePosition();
     },
 
+    timer() {
+      setInterval(this.autoScrollSlide, 2000);
+    },
     autoScrollSlide() {
       if (this.activeItemId < this.slider.length && this.autoScroll ) {
         this.activeItemId++;
@@ -105,23 +103,9 @@ export default {
     }
   },
 
-  beforeDestroy() {
-    if (this.autoScrollSlideInterval) {
-      clearInterval(this.autoScrollSlideInterval);
-    }
-  },
-
   mounted() {
-    const lastSeenCluster = sessionStorage.getItem(carouselSeenStorageKey);
-
-    if (lastSeenCluster !== this.clusterId) {
-      // Session storage lasts until tab/window closed (retained on refresh)
-      sessionStorage.setItem(carouselSeenStorageKey, this.clusterId);
-
-      this.autoScrollSlideInterval = setInterval(this.autoScrollSlide, 5000);
-    }
-  },
-
+    this.timer();
+  }
 };
 
 </script>

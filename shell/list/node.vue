@@ -34,10 +34,6 @@ export default {
       type:     Object,
       required: true,
     },
-    useQueryParamsForSimpleFiltering: {
-      type:    Boolean,
-      default: false
-    }
   },
 
   async fetch() {
@@ -155,15 +151,12 @@ export default {
       :rows="rows"
       :sub-rows="true"
       :loading="loading"
-      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
       v-on="$listeners"
     >
-      <template #sub-row="{fullColspan, row, onRowMouseEnter, onRowMouseLeave}">
+      <template #sub-row="{fullColspan, row}">
         <tr
           class="taints sub-row"
           :class="{'empty-taints': !row.spec.taints || !row.spec.taints.length}"
-          @mouseenter="onRowMouseEnter"
-          @mouseleave="onRowMouseLeave"
         >
           <template v-if="row.spec.taints && row.spec.taints.length">
             <td>&nbsp;</td>

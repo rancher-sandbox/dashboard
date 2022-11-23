@@ -78,7 +78,7 @@ export default {
   <div>
     <div>
       <div class="masthead">
-        <header class="header-layout">
+        <header>
           <div class="title">
             <h1 class="m-0">
               {{ t('authGroups.assignEdit.assignTitle') }}
@@ -87,7 +87,7 @@ export default {
         </header>
       </div>
 
-      <form onsubmit="return false;">
+      <form>
         <SelectPrincipal
           :retain-selection="true"
           class="mb-20"

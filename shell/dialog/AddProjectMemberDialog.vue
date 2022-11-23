@@ -89,7 +89,7 @@ export default {
 
     <div
       slot="body"
-      class="pl-10 pr-10 pb-10"
+      class="pl-10 pr-10"
     >
       <ProjectMemberEditor
         v-model="member"
@@ -125,12 +125,5 @@ export default {
     display: flex;
     justify-content: flex-end;
     width: 100%;
-  }
-</style>
-
-<style lang="scss">
-  .card-container {
-    border: 1px solid var(--border);
-    box-shadow: none;
   }
 </style>

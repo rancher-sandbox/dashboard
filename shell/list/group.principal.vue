@@ -25,11 +25,6 @@ export default {
       type:     Object,
       required: true,
     },
-
-    useQueryParamsForSimpleFiltering: {
-      type:    Boolean,
-      default: false
-    }
   },
   async fetch() {
     await this.updateRows();
@@ -131,7 +126,6 @@ export default {
           :waiting-label="t('authGroups.actions.refresh')"
           :success-label="t('authGroups.actions.refresh')"
           :error-label="t('authGroups.actions.refresh')"
-          :class="{'mr-5': canCreateGlobalRoleBinding}"
           @click="refreshGroupMemberships"
         />
         <n-link
@@ -147,7 +141,6 @@ export default {
     <ResourceTable
       :schema="schema"
       :rows="rows"
-      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     />
   </div>
 </template>

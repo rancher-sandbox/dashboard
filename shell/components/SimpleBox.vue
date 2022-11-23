@@ -38,17 +38,13 @@ export default {
       class="top"
     >
       <slot name="title">
-        <h2
-          v-if="title"
-          data-testid="simple-box-title"
-        >
+        <h2 v-if="title">
           {{ title }}
         </h2>
       </slot>
       <div
         v-if="canClose || pref"
         class="close-button"
-        data-testid="simple-box-close"
         @click="closeBox($event)"
       >
         <i class="icon icon-close" />

@@ -87,8 +87,7 @@ export default {
       const t = this.$store.getters['i18n/t'];
       let out = [];
 
-      // TODO: Add return info
-      if (this.currentProduct?.customNamespaceFilter && this.currentProduct?.inStore) {
+      if (this.currentProduct.customNamespaceFilter) {
         // Sometimes the component can show before the 'currentProduct' has caught up, so access the product via the getter rather
         // than caching it in the `fetch`
         return this.$store.getters[`${ this.currentProduct.inStore }/namespaceFilterOptions`]({
@@ -97,7 +96,6 @@ export default {
         });
       }
 
-      // TODO: Add return info
       if (!this.currentProduct?.hideSystemResources) {
         out = [
           {
@@ -131,11 +129,6 @@ export default {
       }
 
       const inStore = this.$store.getters['currentStore'](NAMESPACE);
-
-      if (!inStore) {
-        return out;
-      }
-
       let namespaces = sortBy(
         this.$store.getters[`${ inStore }/all`](NAMESPACE),
         ['nameDisplay']
@@ -256,21 +249,19 @@ export default {
 
     value: {
       get() {
-        // Use last picked filter from user preferences
         const prefs = this.$store.getters['prefs/get'](NAMESPACE_FILTERS);
-
-        const prefDefault = this.currentProduct?.customNamespaceFilter ? [] : [ALL_USER];
-        const values = prefs && prefs[this.key] ? prefs[this.key] : prefDefault;
+        const prefDefault = this.currentProduct.customNamespaceFilter ? [] : [ALL_USER];
+        const values = prefs[this.key] || prefDefault;
         const options = this.options;
 
         // Remove values that are not valid options
-        const filters = values
+        const out = values
           .map((value) => {
             return findBy(options, 'id', value);
           })
           .filter(x => !!x);
 
-        return filters;
+        return out;
       },
 
       set(neu) {
@@ -300,7 +291,7 @@ export default {
         // If there was something selected and you remove it, go back to user by default
         // Unless it was user or all
         if (neu.length === 0 && !hadUser && !hadAll) {
-          ids = this.currentProduct?.customNamespaceFilter ? [] : [ALL_USER];
+          ids = this.currentProduct.customNamespaceFilter ? [] : [ALL_USER];
         } else {
           ids = neu.map(x => x.id);
         }
@@ -435,23 +426,14 @@ export default {
       }
     },
     inputKeyHandler(e) {
-      switch (e.keyCode) {
-      case KEY.DOWN:
+      if (e.keyCode === KEY.DOWN ) {
         e.preventDefault();
         e.stopPropagation();
         this.down(true);
-        break;
-      case KEY.TAB:
+      } else if (e.keyCode === KEY.TAB) {
         // Tab out of the input box
         this.close();
         e.target.blur();
-        break;
-      case KEY.CR:
-        if (this.filtered.length === 1) {
-          this.selectOption(this.filtered[0]);
-          this.filter = '';
-        }
-        break;
       }
     },
     mouseOver(event) {
@@ -571,7 +553,6 @@ export default {
 <template>
   <div
     class="ns-filter"
-    data-testid="namespaces-filter"
     tabindex="0"
     @focus="open()"
   >
@@ -580,68 +561,53 @@ export default {
       class="ns-glass"
       @click="close()"
     />
-
-    <!-- Select Dropdown control -->
+    <!-- Dropdown control -->
     <div
       ref="dropdown"
       class="ns-dropdown"
-      data-testid="namespaces-dropdown"
       :class="{ 'ns-open': isOpen }"
       @click="toggle()"
     >
-      <!-- No filters found or available -->
       <div
         v-if="value.length === 0"
         ref="values"
-        data-testid="namespaces-values-none"
         class="ns-values"
       >
         {{ t('nav.ns.all') }}
       </div>
-
-      <!-- Filtered by set with custom label E.g. "All namespaces" -->
       <div
         v-else-if="isSingleSpecial"
         ref="values"
-        data-testid="namespaces-values-label"
         class="ns-values"
       >
         {{ value[0].label }}
       </div>
-
-      <!-- All the selected namespaces -->
       <div
         v-else
         ref="values"
         v-tooltip="tooltip"
-        data-testid="namespaces-values"
         class="ns-values"
       >
         <div
           v-if="total"
           ref="total"
-          data-testid="namespaces-values-total"
           class="ns-value ns-abs"
         >
           {{ t('namespaceFilter.selected.label', { total }) }}
         </div>
         <div
-          v-for="(ns, j) in value"
+          v-for="ns in value"
           ref="value"
           :key="ns.id"
-          :data-testid="`namespaces-value-${j}`"
           class="ns-value"
         >
           <div>{{ ns.label }}</div>
           <i
             class="icon icon-close"
-            :data-testid="`namespaces-values-close-${j}`"
             @click="removeOption(ns, $event)"
           />
         </div>
       </div>
-
-      <!-- Inform user if more namespaces are selected -->
       <div
         v-if="hidden > 0"
         ref="more"
@@ -664,12 +630,9 @@ export default {
       class="hide"
       @shortkey="open()"
     />
-
-    <!-- Dropdown menu -->
     <div
       v-if="isOpen"
       class="ns-dropdown-menu"
-      data-testid="namespaces-menu"
     >
       <div class="ns-controls">
         <div class="ns-input">
@@ -700,16 +663,12 @@ export default {
         role="list"
       >
         <div
-          v-for="(opt, i) in filtered"
+          v-for="opt in filtered"
           :id="opt.elementId"
           :key="opt.id"
           tabindex="0"
           class="ns-option"
-          :class="{
-            'ns-selected': opt.selected,
-            'ns-single-match': filtered.length === 1 && !opt.selected,
-          }"
-          :data-testid="`namespaces-option-${i}`"
+          :class="{'ns-selected': opt.selected}"
           @click="selectOption(opt)"
           @mouseover="mouseOver($event)"
           @keydown="itemKeyHandler($event, opt)"
@@ -736,7 +695,6 @@ export default {
         <div
           v-if="filtered.length === 0"
           class="ns-none"
-          data-testid="namespaces-option-none"
         >
           {{ t('namespaceFilter.noMatchingOptions') }}
         </div>
@@ -872,31 +830,24 @@ export default {
             }
           }
         }
-        &.ns-selected:not(:hover) {
-          .ns-item {
-            > * {
-              color: var(--dropdown-hover-bg);
-            }
+      &.ns-selected:not(:hover) {
+        .ns-item {
+          > * {
+            color: var(--dropdown-hover-bg);
           }
         }
-        &.ns-selected {
-          &:hover,&:focus {
-            .ns-item {
-              > * {
-                background-color: var(--dropdown-hover-bg);
-                color: var(--dropdown-hover-text);
-              }
-            }
-          }
-        }
-        &.ns-single-match {
+      }
+      &.ns-selected {
+        &:hover,&:focus {
           .ns-item {
-            background-color: var(--dropdown-hover-bg);
             > * {
+              background-color: var(--dropdown-hover-bg);
               color: var(--dropdown-hover-text);
             }
           }
         }
+      }
+
       }
     }
 

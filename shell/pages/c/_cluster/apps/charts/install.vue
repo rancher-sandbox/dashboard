@@ -95,9 +95,11 @@ export default {
     this.errors = [];
 
     // If the chart doesn't contain system `systemDefaultRegistry` properties there's no point applying them
-    this.clusterRegistry = await this.getClusterRegistry();
-    this.globalRegistry = await this.getGlobalRegistry();
-    this.defaultRegistrySetting = this.clusterRegistry || this.globalRegistry;
+    if (this.showCustomRegistry) {
+      this.clusterRegistry = await this.getClusterRegistry();
+      this.globalRegistry = await this.getGlobalRegistry();
+      this.defaultRegistrySetting = this.clusterRegistry || this.globalRegistry;
+    }
 
     this.serverUrlSetting = await this.$store.dispatch('management/find', {
       type: MANAGEMENT.SETTING,
@@ -282,13 +284,15 @@ export default {
       */
       this.chartValues = merge(merge({}, this.versionInfo?.values || {}), userValues);
 
-      const existingRegistry = this.chartValues?.global?.systemDefaultRegistry || this.chartValues?.global?.cattle?.systemDefaultRegistry;
+      if (this.showCustomRegistry) {
+        const existingRegistry = this.chartValues?.global?.systemDefaultRegistry || this.chartValues?.global?.cattle?.systemDefaultRegistry;
 
-      delete this.chartValues?.global?.systemDefaultRegistry;
-      delete this.chartValues?.global?.cattle?.systemDefaultRegistry;
+        delete this.chartValues?.global?.systemDefaultRegistry;
+        delete this.chartValues?.global?.cattle?.systemDefaultRegistry;
 
-      this.customRegistrySetting = existingRegistry || this.defaultRegistrySetting;
-      this.showCustomRegistryInput = !!this.customRegistrySetting;
+        this.customRegistrySetting = existingRegistry || this.defaultRegistrySetting;
+        this.showCustomRegistryInput = !!this.customRegistrySetting;
+      }
 
       /* Serializes an object as a YAML document */
       this.valuesYaml = saferDump(this.chartValues);
@@ -434,7 +438,7 @@ export default {
       const cluster = this.currentCluster;
       const projects = this.$store.getters['management/all'](MANAGEMENT.PROJECT);
 
-      const out = projects.filter(x => x.spec.clusterName === cluster?.id).map((project) => {
+      const out = projects.filter(x => x.spec.clusterName === cluster.id).map((project) => {
         return {
           id:    project.id,
           label: project.nameDisplay,
@@ -660,6 +664,22 @@ export default {
       return null;
     },
 
+    /**
+     * Check if the chart contains `systemDefaultRegistry` properties. If not we shouldn't apply the setting (or show the UI for them)
+     */
+    showCustomRegistry() {
+      const global = this.versionInfo?.values?.global || {};
+
+      return global.systemDefaultRegistry !== undefined || global.cattle?.systemDefaultRegistry !== undefined;
+    },
+
+    /**
+     * True if we should apply/save the custom registry value. This should be false if matching the global registry
+     * (we shouldn't save the global registry to avoid issues on upgrade where we might confused it with a custom one)
+     */
+    applyCustomRegistry() {
+      return this.customRegistrySetting !== this.globalRegistry;
+    }
   },
 
   watch: {
@@ -763,10 +783,10 @@ export default {
 
       if (hasPermissionToSeeProvCluster) {
         const mgmCluster = this.$store.getters['currentCluster'];
-        const provCluster = mgmCluster ? await this.$store.dispatch('management/find', {
+        const provCluster = await this.$store.dispatch('management/find', {
           type: CAPI.RANCHER_CLUSTER,
           id:   mgmCluster.provClusterId
-        }) : {};
+        });
 
         if (provCluster.isRke2) { // isRke2 returns true for both RKE2 and K3s clusters.
           const agentConfig = provCluster.spec.rkeConfig.machineSelectorConfig.find(x => !x.machineLabelSelector).config;
@@ -777,19 +797,6 @@ export default {
 
           if (clusterRegistry) {
             return clusterRegistry;
-          }
-        }
-        if (provCluster.isRke1) {
-          // For RKE1 clusters, the cluster scoped private registry is on the management
-          // cluster, not the provisioning cluster.
-          const rke1Registries = mgmCluster.spec.rancherKubernetesEngineConfig.privateRegistries;
-
-          if (rke1Registries?.length > 0) {
-            const defaultRegistry = rke1Registries.find((registry) => {
-              return registry.isDefault;
-            });
-
-            return defaultRegistry.url;
           }
         }
       }
@@ -970,14 +977,20 @@ export default {
       const systemProjectId = projects.find(p => p.spec?.displayName === 'System')?.id?.split('/')?.[1] || '';
 
       const serverUrl = this.serverUrlSetting?.value || '';
-      const isWindows = (cluster?.workerOSs || []).includes(WINDOWS);
+      const isWindows = (cluster.workerOSs || []).includes(WINDOWS);
       const pathPrefix = cluster?.spec?.rancherKubernetesEngineConfig?.prefixPath || '';
       const windowsPathPrefix = cluster?.spec?.rancherKubernetesEngineConfig?.winPrefixPath || '';
 
       setIfNotSet(cattle, 'clusterId', cluster?.id);
       setIfNotSet(cattle, 'clusterName', cluster?.nameDisplay);
-      set(cattle, 'systemDefaultRegistry', this.customRegistrySetting);
-      set(global, 'systemDefaultRegistry', this.customRegistrySetting);
+      if (this.showCustomRegistry) {
+        // If this is the current global registry leave it blank. This avoids the scenario on upgrade where a previous global registry that's
+        // been updated is confused with a custom user registry
+        const registry = this.applyCustomRegistry ? this.customRegistrySetting : '';
+
+        set(cattle, 'systemDefaultRegistry', registry);
+        set(global, 'systemDefaultRegistry', registry);
+      }
 
       setIfNotSet(global, 'cattle.systemProjectId', systemProjectId);
       setIfNotSet(cattle, 'url', serverUrl);
@@ -1004,7 +1017,7 @@ export default {
 
       const cluster = this.$store.getters['currentCluster'];
       const serverUrl = this.serverUrlSetting?.value || '';
-      const isWindows = (cluster?.workerOSs || []).includes(WINDOWS);
+      const isWindows = (cluster.workerOSs || []).includes(WINDOWS);
       const pathPrefix = cluster?.spec?.rancherKubernetesEngineConfig?.prefixPath || '';
       const windowsPathPrefix = cluster?.spec?.rancherKubernetesEngineConfig?.winPrefixPath || '';
 
@@ -1417,12 +1430,16 @@ export default {
           />
 
           <Checkbox
+            v-if="showCustomRegistry"
             v-model="showCustomRegistryInput"
             class="mb-20"
             :label="t('catalog.chart.registry.custom.checkBoxLabel')"
             :tooltip="t('catalog.chart.registry.tooltip')"
           />
-          <div class="row">
+          <div
+            v-if="showCustomRegistry"
+            class="row"
+          >
             <div class="col span-6">
               <LabeledInput
                 v-if="showCustomRegistryInput"

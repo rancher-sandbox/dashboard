@@ -5,10 +5,9 @@ import { mapGetters } from 'vuex';
 import { isArray, removeObject } from '@shell/utils/array';
 import { clone } from '@shell/utils/object';
 import { convert, simplify } from '@shell/utils/selector';
-import LabeledSelect from '@shell/components/form/LabeledSelect';
 
 export default {
-  components: { Select, LabeledSelect },
+  components: { Select },
   props:      {
     // Array of actual match expressions
     // or k8s selector Object of {matchExpressions, matchLabels}
@@ -39,12 +38,6 @@ export default {
     showRemove: {
       type:    Boolean,
       default: true
-    },
-
-    // if options are passed for keys, then the key's input will become a select
-    keysSelectOptions: {
-      type:    Array,
-      default: () => []
     }
   },
 
@@ -113,10 +106,6 @@ export default {
 
     pod() {
       return POD;
-    },
-
-    hasKeySelectOptions() {
-      return !!this.keysSelectOptions?.length;
     },
 
     ...mapGetters({ t: 'i18n/t' })
@@ -206,17 +195,11 @@ export default {
           {{ row.key }}
         </div>
         <input
-          v-else-if="!hasKeySelectOptions"
+          v-else
           v-model="row.key"
           :mode="mode"
           @input="update"
         >
-        <LabeledSelect
-          v-else
-          v-model="row.key"
-          :mode="mode"
-          :options="keysSelectOptions"
-        />
       </div>
       <div
         :data-testid="`input-match-expression-operator-${index}`"
