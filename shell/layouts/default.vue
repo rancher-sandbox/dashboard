@@ -589,13 +589,13 @@ export default {
       v-if="managementReady"
       class="dashboard-content"
       :class="{
-        'dashboard-content-grid': !featureRancherDesktop,
-        'desktop-content-grid': featureRancherDesktop
+        'dashboard-content-grid': true,
+        'desktop-content-grid': false
       }"
     >
       <Header />
       <activity-bar
-        v-if="featureRancherDesktop"
+        v-if="false"
         class="activity-bar"
       />
       <nav
