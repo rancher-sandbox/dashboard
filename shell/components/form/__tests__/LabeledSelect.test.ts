@@ -424,4 +424,55 @@ describe('component: LabeledSelect', () => {
       expect(wrapper.vm.isOpen).toBe(false);
     });
   });
+
+  describe('translating the vue-select strings', () => {
+    const t = (key: string, args?: { option: string }) => `%${ key }${ args ? ` ${ args.option }` : '' }%`;
+    const deselectLabel = (option: string) => `%labeledSelect.deselect ${ option }%`;
+    const mountWithStore = ($store: unknown) => mount(LabeledSelect, {
+      props: {
+        value:    ['foo'],
+        options:  ['foo', 'bar'],
+        multiple: true,
+        mode:     _EDIT,
+      },
+      global: { mocks: { $store } },
+    });
+    const mountSelect = (exists = true) => mountWithStore({ getters: { 'i18n/t': t, 'i18n/exists': () => exists } });
+
+    it.each([
+      ['.vs__dropdown-toggle', 'aria-label', '%labeledSelect.searchOption%'],
+      ['.vs__clear', 'title', '%labeledSelect.clearSelected%'],
+      ['.vs__clear', 'aria-label', '%labeledSelect.clearSelected%'],
+      ['.vs__deselect', 'title', deselectLabel('foo')],
+      ['.vs__deselect', 'aria-label', deselectLabel('foo')],
+    ])('should translate the %s %s', (selector, attribute, expected) => {
+      expect(mountSelect().find(selector).attributes(attribute)).toBe(expected);
+    });
+
+    it('should translate the spinner text', () => {
+      expect(mountSelect().find('.vs__spinner').text()).toBe('%labeledSelect.loading%');
+    });
+
+    it('should keep the English strings when the running Rancher lacks the keys', () => {
+      expect(mountSelect(false).find('.vs__dropdown-toggle').attributes('aria-label')).toBe('Search for option');
+    });
+
+    it.each([
+      ['no store', undefined],
+      ['no getters', {}],
+      ['i18n/exists without i18n/t', { getters: { 'i18n/exists': () => true } }],
+    ])('should keep the English strings with %s', (_, store) => {
+      expect(mountWithStore(store).find('.vs__dropdown-toggle').attributes('aria-label')).toBe('Search for option');
+    });
+
+    it('should translate a new deselect button once and leave the existing one alone', async() => {
+      const wrapper = mountSelect();
+
+      await wrapper.setProps({ value: ['foo', 'bar'] });
+
+      const labels = wrapper.findAll('.vs__deselect').flatMap((el) => [el.attributes('title'), el.attributes('aria-label')]);
+
+      expect(labels).toStrictEqual([deselectLabel('foo'), deselectLabel('foo'), deselectLabel('bar'), deselectLabel('bar')]);
+    });
+  });
 });

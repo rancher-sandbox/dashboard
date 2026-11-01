@@ -4217,6 +4217,10 @@ labelSelect:
 labeledSelect:
   startTyping: Start typing to define an item
   pressEnter: Press enter to add "{input}"
+  clearSelected: Clear Selected
+  deselect: 'Deselect {option}'
+  loading: Loading...
+  searchOption: Search for option
 
 landing:
   bannerImage: Homepage banner image
