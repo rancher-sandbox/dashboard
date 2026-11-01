@@ -364,20 +364,20 @@ export default class Workload extends WorkloadService {
         content: this.restartCount
       },
       endpoint: {
-        label:     'Endpoints',
+        label:     this.t('tableHeaders.endpoints'),
         content:   this.endpoint,
         formatter: 'WorkloadDetailEndpoints'
       },
       ready: {
-        label:   'Ready',
+        label:   this.t('component.resource.detail.metadata.identifyingInformation.ready'),
         content: this.ready
       },
       upToDate: {
-        label:   'Up-to-date',
+        label:   this.t('component.resource.detail.metadata.identifyingInformation.up-to-date'),
         content: this.upToDate
       },
       available: {
-        label:   'Available',
+        label:   this.t('component.resource.detail.metadata.identifyingInformation.available'),
         content: this.available
       }
     };
@@ -389,7 +389,7 @@ export default class Workload extends WorkloadService {
 
       if ( startTime ) {
         out.push({
-          label:         'Started',
+          label:         this.t('workload.detailTop.started'),
           content:       startTime,
           formatter:     'LiveDate',
           formatterOpts: { addSuffix: true },
@@ -419,18 +419,18 @@ export default class Workload extends WorkloadService {
         label += ` ${ this.t(`unit.${ LABELS[i] }`, { count: label }) } `;
         label = label.trim();
 
-        out.push({ label: 'Duration', content: label });
+        out.push({ label: this.t('tableHeaders.duration'), content: label });
       }
     } else if ( type === WORKLOAD_TYPES.CRON_JOB ) {
       out.push({
-        label:     'Last Scheduled Time',
+        label:     this.t('workload.detailTop.duration'),
         content:   this?.status?.lastScheduleTime,
         formatter: 'LiveDate'
       });
     }
 
     out.push({
-      label:     'Image',
+      label:     this.t('workload.detailTop.image'),
       content:   this.imageNames,
       formatter: 'PodImages'
     }, {

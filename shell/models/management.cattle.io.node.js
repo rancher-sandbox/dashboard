@@ -60,7 +60,7 @@ export default class MgmtNode extends HybridModel {
   get roles() {
     const { isControlPlane, isWorker, isEtcd } = this;
 
-    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t('generic.all'));
+    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t);
   }
 
   get pool() {

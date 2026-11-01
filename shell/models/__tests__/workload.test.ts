@@ -881,4 +881,44 @@ describe('class: Workload', () => {
       expect(ingressesRow).toBeUndefined();
     });
   });
+
+  describe('getter: details', () => {
+    const image = '%workload.detailTop.image%';
+    const restarts = '%resourceDetail.masthead.restartCount%';
+    const endpoints = '%tableHeaders.endpoints%';
+    const identifying = 'component.resource.detail.metadata.identifyingInformation';
+
+    it.each([
+      [
+        WORKLOAD_TYPES.DEPLOYMENT,
+        {},
+        [image, restarts, `%${ identifying }.ready%`, `%${ identifying }.up-to-date%`, `%${ identifying }.available%`, endpoints],
+      ],
+      [
+        WORKLOAD_TYPES.JOB,
+        { startTime: '2026-01-01T00:00:00Z', completionTime: '2026-01-01T00:01:00Z' },
+        ['%workload.detailTop.started%', '%tableHeaders.duration%', image, restarts, endpoints],
+      ],
+      [
+        WORKLOAD_TYPES.CRON_JOB,
+        {},
+        ['%workload.detailTop.duration%', image, restarts, endpoints],
+      ],
+    ])('should translate the labels of a %s', (type, status, expected) => {
+      const workload = new Workload({
+        type,
+        metadata: { name: 'test', namespace: 'default' },
+        spec:     { template: { spec: { containers: [{ image: 'nginx' }] } } },
+        status,
+      }, {
+        getters:     { schemaFor: () => ({ linkFor: jest.fn() }) },
+        dispatch:    jest.fn(),
+        rootGetters: { 'i18n/t': (key: string) => `%${ key }%` },
+      });
+
+      const labels = workload.details.map((d: any) => d.label).filter((label: string) => label);
+
+      expect(labels).toStrictEqual(expected);
+    });
+  });
 });
