@@ -304,7 +304,7 @@ export default {
           type="number"
           min="1"
           max="65535"
-          placeholder="e.g. 8080"
+          :placeholder="t('generic.placeholder', {text: '8080'}, true)"
           :label="t('workload.container.ports.containerPort')"
           :required="row._serviceType === 'LoadBalancer' "
           @update:value="queueUpdate"
@@ -333,7 +333,7 @@ export default {
           type="number"
           min="1"
           max="65535"
-          placeholder="e.g. 80"
+          :placeholder="t('generic.placeholder', {text: '80'}, true)"
           :label="t('workload.container.ports.hostPort')"
           @update:value="queueUpdate"
         />
@@ -347,7 +347,7 @@ export default {
           ref="port"
           v-model:value="row.hostIP"
           :mode="mode"
-          placeholder="e.g. 1.1.1.1"
+          :placeholder="t('generic.placeholder', {text: '1.1.1.1'}, true)"
           :label="t('workload.container.ports.hostIP')"
           @update:value="queueUpdate"
         />

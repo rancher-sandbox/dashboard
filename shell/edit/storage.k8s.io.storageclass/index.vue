@@ -217,7 +217,7 @@ export default {
 
     <LabeledSelect
       :value="value.provisioner"
-      label="Provisioner"
+      :label="t('tableHeaders.storage_class_provisioner')"
       :options="provisioners"
       :localized-label="true"
       :get-option-label="getOptionLabel"

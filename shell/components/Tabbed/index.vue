@@ -398,7 +398,7 @@ export default {
         <a
           href="#"
           @click.prevent
-        >(None)</a>
+        >{{ t('tabs.none') }}</a>
       </li>
       <ul
         v-if="sideTabs && showTabsAddRemove"

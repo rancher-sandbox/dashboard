@@ -44,17 +44,24 @@ export default {
 
   data() {
     return {
-      args:           this.value.args,
-      command:        this.value.command,
-      commandOptions: ['No', 'Once', 'Yes'],
-      stdin:          this.value.stdin || false,
-      stdinOnce:      this.value.stdin || false,
-      tty:            this.value.tty || false,
-      workingDir:     this.value.workingDir,
+      args:       this.value.args,
+      command:    this.value.command,
+      stdin:      this.value.stdin || false,
+      stdinOnce:  this.value.stdin || false,
+      tty:        this.value.tty || false,
+      workingDir: this.value.workingDir,
     };
   },
 
   computed: {
+    commandOptions() {
+      return [
+        { label: this.t('generic.no'), value: 'No' },
+        { label: this.t('workload.container.command.once'), value: 'Once' },
+        { label: this.t('generic.yes'), value: 'Yes' },
+      ];
+    },
+
     stdinSelect: {
       get() {
         if (this.stdin) {

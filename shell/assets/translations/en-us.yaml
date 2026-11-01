@@ -34,6 +34,7 @@ generic:
   copiedToClipboard: Text copied to Clipboard
   create: Create
   created: Created
+  custom: Custom
   customize: Customize
   dashboard: Dashboard
   default: Default
@@ -174,6 +175,7 @@ generic:
 
 tabs:
   addItem: Add a new tab item
+  none: (None)
   removeItem: Remove selected tab item
 
 graph:
@@ -5204,6 +5206,8 @@ notificationCenter:
   ariaLabel: 'Notification {title}: Press enter to interact'
 
 persistentVolume:
+  age: "Age:"
+  claim: "Persistent Volume Claim:"
   pluginConfiguration:
     label: Plugin configuration
   plugin:
@@ -5877,6 +5881,9 @@ probe:
   type:
     label: Type
     placeholder: Select a check type
+
+progressBar:
+  ariaLabel: '{count, plural, =1 {# item} other {# items}} {label}'
 
 project:
   membersEditOnly: Only permissions equal to or below those of the current user can be applied
@@ -7627,6 +7634,7 @@ workload:
           placeholder: e.g. bar
       tty: TTY
       workingDir: WorkingDir
+      once: Once
       stdin: Stdin
     containerName: Container Name
     healthCheck:

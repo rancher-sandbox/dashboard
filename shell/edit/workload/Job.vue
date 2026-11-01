@@ -300,7 +300,7 @@ export default {
             :label="t('workload.job.suspend')"
             name="suspend"
             :options="[true, false]"
-            :labels="['Yes', 'No']"
+            :labels="[t('generic.yes'), t('generic.no')]"
             @update:value="update"
           />
         </div>
