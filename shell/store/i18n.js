@@ -63,6 +63,11 @@ export const getters = {
   },
 
   t: (state) => (key, args, language) => {
+    // Some callers of the mapped getter pass `true` here, as they would for `raw` on the global `t`
+    if ( typeof language !== 'string' ) {
+      language = undefined;
+    }
+
     if (state.selected === NONE && !language) {
       return `%${ key }%`;
     }

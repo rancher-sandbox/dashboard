@@ -206,6 +206,20 @@ describe('i18n store', () => {
 
         expect(translate('greeting', {}, 'en-us')).toStrictEqual('Hello');
       });
+
+      it('uses the selected locale when the third argument is not a locale name', () => {
+        const s = makeState({ selected: 'zh-hans' });
+        const translate = getters.t(s);
+
+        expect(translate('greeting', {}, true)).toStrictEqual('你好');
+      });
+
+      it('returns a %key% placeholder when selected is NONE and the third argument is not a locale name', () => {
+        const s = makeState({ selected: NONE });
+        const translate = getters.t(s);
+
+        expect(translate('t.noneKeyRaw', {}, true)).toStrictEqual('%t.noneKeyRaw%');
+      });
     });
 
     describe('exists', () => {
