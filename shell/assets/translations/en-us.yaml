@@ -6117,6 +6117,7 @@ rbac:
       no: No
     tabs:
       grantResources:
+        addResource: Add Resource
         label: Grant Resources
         noApiGroupClusterScope: Core K8s API, Cluster Scoped
         noApiGroupNamespaceScope: Core K8s API, Namespaced
@@ -6131,6 +6132,8 @@ rbac:
           nonResourceUrls: Non-Resource URLs
           apiGroups: API Groups
         psaWarning: Granting Project Roles the ability to amend PSA labels could lead to a weaker security posture and allow for privilege escalation. This is only recommended for advanced users who understand the risks involved.
+      inheritFrom:
+        label: Inherit From
     subtypes:
       GLOBAL:
         createButton: Create Global Role

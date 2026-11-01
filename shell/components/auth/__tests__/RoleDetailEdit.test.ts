@@ -81,4 +81,18 @@ describe('component: RoleDetailEdit', () => {
 
     expect(wrapper.vm.value.rules[0].verbs).toStrictEqual(verbs);
   });
+
+  it('should give the verb columns translated headers', () => {
+    const headers = (RoleDetailEdit as any).computed.ruleHeaders.call({ verbKey: jest.fn() });
+
+    expect(headers.slice(0, 7).map((header: any) => header.labelKey)).toStrictEqual([
+      'tableHeaders.rbac.create',
+      'tableHeaders.rbac.delete',
+      'tableHeaders.rbac.get',
+      'tableHeaders.rbac.list',
+      'tableHeaders.rbac.patch',
+      'tableHeaders.rbac.update',
+      'tableHeaders.rbac.watch',
+    ]);
+  });
 });

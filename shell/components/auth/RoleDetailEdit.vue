@@ -340,8 +340,10 @@ export default {
       return this.createRules(this.value);
     },
     ruleHeaders() {
+      // i18n-uses tableHeaders.rbac.*
       const verbHeaders = VERBS.map((verb) => ({
         name:      verb,
+        labelKey:  `tableHeaders.rbac.${ verb }`,
         key:       ucFirst(verb),
         value:     this.verbKey(verb),
         formatter: 'Checked',
@@ -618,7 +620,7 @@ export default {
         :mode="mode"
         name-key="displayName"
         description-key="description"
-        label="Name"
+        :label="t('generic.name')"
         :rules="{ name: fvGetAndReportPathRules('displayName') }"
         @update:value="$emit('input', $event)"
       />
@@ -666,14 +668,14 @@ export default {
           />
           <ArrayList
             v-model:value="value.rules"
-            label="Resources"
+            :label="t('tableHeaders.resources')"
             :disabled="isBuiltin"
             :remove-allowed="!isBuiltin"
             :add-allowed="!isBuiltin"
             :default-add-value="defaultRule"
             :initial-empty-row="true"
             :show-header="true"
-            add-label="Add Resource"
+            :add-label="t('rbac.roletemplate.tabs.grantResources.addResource')"
             :mode="mode"
           >
             <template #column-headers>
@@ -779,7 +781,7 @@ export default {
         <Tab
           v-if="isRancherRoleTemplate"
           name="inherit-from"
-          label="Inherit From"
+          :label="t('rbac.roletemplate.tabs.inheritFrom.label')"
           :weight="0"
         >
           <ArrayList
@@ -787,8 +789,8 @@ export default {
             :disabled="isBuiltin"
             :remove-allowed="!isBuiltin"
             :add-allowed="!isBuiltin"
-            label="Resources"
-            add-label="Add Resource"
+            :label="t('tableHeaders.resources')"
+            :add-label="t('rbac.roletemplate.tabs.grantResources.addResource')"
             :mode="mode"
           >
             <template #columns="props">
