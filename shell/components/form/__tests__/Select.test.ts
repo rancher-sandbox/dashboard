@@ -1,5 +1,6 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { defineComponent } from 'vue';
+import flushPromises from 'flush-promises';
 import Select from '@shell/components/form/Select.vue';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 
@@ -232,6 +233,39 @@ describe('select.vue', () => {
 
       expect(wrapper.emitted('update:value')).toBeUndefined();
       expect(wrapper.vm.isOpen).toBe(false);
+    });
+  });
+
+  describe('given no options to show', () => {
+    const noOptionsText = async(search: string, slots = {}) => {
+      const wrapper = mount(Select, {
+        attachTo: document.body,
+        props:    {
+          options: [], mode: _EDIT, appendToBody: false
+        },
+        slots,
+      });
+
+      wrapper.vm.clickSelect();
+      await flushPromises();
+      await wrapper.find('.vs__search').setValue(search);
+
+      const text = wrapper.find('.vs__no-options').text();
+
+      wrapper.unmount();
+
+      return text;
+    };
+
+    it.each([
+      ['', '%labelSelect.noOptions.empty%'],
+      ['foo', '%labelSelect.noOptions.noMatch%'],
+    ])('should show the translated text given search %p', async(search, expected) => {
+      expect(await noOptionsText(search)).toBe(expected);
+    });
+
+    it('should let the caller replace the text', async() => {
+      expect(await noOptionsText('', { 'no-options': 'Nothing here' })).toBe('Nothing here');
     });
   });
 });
