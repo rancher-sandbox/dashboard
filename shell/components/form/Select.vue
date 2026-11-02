@@ -379,6 +379,9 @@ export default {
           {{ getOptionLabel(option.label) }}
         </div>
       </template>
+      <template #no-options="{ search }">
+        {{ t(search ? 'labelSelect.noOptions.noMatch' : 'labelSelect.noOptions.empty', {}, true) }}
+      </template>
       <!-- Pass down templates provided by the caller -->
       <template
         v-for="(_, slot) of $slots"

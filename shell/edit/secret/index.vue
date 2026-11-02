@@ -135,7 +135,7 @@ export default {
 
     const secretTypes = [
       {
-        label: 'Custom',
+        label: this.t('generic.custom'),
         value: 'custom'
       },
       {

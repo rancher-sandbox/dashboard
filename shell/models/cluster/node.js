@@ -174,7 +174,7 @@ export default class ClusterNode extends SteveModel {
   get roles() {
     const { isControlPlane, isWorker, isEtcd } = this;
 
-    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t('generic.all'));
+    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t);
   }
 
   get version() {
@@ -472,23 +472,23 @@ function calculatePercentage(allocatable, capacity) {
   return formatPercent(percent);
 }
 
-export function listNodeRoles(isControlPlane, isWorker, isEtcd, allString) {
+export function listNodeRoles(isControlPlane, isWorker, isEtcd, t) {
   const res = [];
 
   if (isControlPlane) {
-    res.push('Control Plane');
+    res.push(t('model.machine.role.controlPlane'));
   }
 
   if (isWorker) {
-    res.push('Worker');
+    res.push(t('model.machine.role.worker'));
   }
 
   if (isEtcd) {
-    res.push('Etcd');
+    res.push(t('model.machine.role.etcd'));
   }
 
   if (res.length === 3 || res.length === 0) {
-    return allString;
+    return t('generic.all');
   }
 
   return res.join(', ');

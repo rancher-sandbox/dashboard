@@ -34,6 +34,7 @@ generic:
   copiedToClipboard: Text copied to Clipboard
   create: Create
   created: Created
+  custom: Custom
   customize: Customize
   dashboard: Dashboard
   default: Default
@@ -174,6 +175,7 @@ generic:
 
 tabs:
   addItem: Add a new tab item
+  none: (None)
   removeItem: Remove selected tab item
 
 graph:
@@ -2857,6 +2859,12 @@ resource:
   errors:
     update: "Error updating {name}"
 
+copyToClipboard:
+  action: Copy
+  waiting: Copying&hellip;
+  success: Copied!
+  error: Error Copying
+
 codeMirror:
   escapeText: Press Shift+Escape to blur from editor
   keymap:
@@ -4215,6 +4223,10 @@ labelSelect:
 labeledSelect:
   startTyping: Start typing to define an item
   pressEnter: Press enter to add "{input}"
+  clearSelected: Clear Selected
+  deselect: 'Deselect {option}'
+  loading: Loading...
+  searchOption: Search for option
 
 landing:
   bannerImage: Homepage banner image
@@ -5204,6 +5216,8 @@ notificationCenter:
   ariaLabel: 'Notification {title}: Press enter to interact'
 
 persistentVolume:
+  age: "Age:"
+  claim: "Persistent Volume Claim:"
   pluginConfiguration:
     label: Plugin configuration
   plugin:
@@ -5878,6 +5892,9 @@ probe:
     label: Type
     placeholder: Select a check type
 
+progressBar:
+  ariaLabel: '{count, plural, =1 {# item} other {# items}} {label}'
+
 project:
   membersEditOnly: Only permissions equal to or below those of the current user can be applied
   members:
@@ -6110,6 +6127,7 @@ rbac:
       no: No
     tabs:
       grantResources:
+        addResource: Add Resource
         label: Grant Resources
         noApiGroupClusterScope: Core K8s API, Cluster Scoped
         noApiGroupNamespaceScope: Core K8s API, Namespaced
@@ -6124,6 +6142,8 @@ rbac:
           nonResourceUrls: Non-Resource URLs
           apiGroups: API Groups
         psaWarning: Granting Project Roles the ability to amend PSA labels could lead to a weaker security posture and allow for privilege escalation. This is only recommended for advanced users who understand the risks involved.
+      inheritFrom:
+        label: Inherit From
     subtypes:
       GLOBAL:
         createButton: Create Global Role
@@ -7627,6 +7647,7 @@ workload:
           placeholder: e.g. bar
       tty: TTY
       workingDir: WorkingDir
+      once: Once
       stdin: Stdin
     containerName: Container Name
     healthCheck:

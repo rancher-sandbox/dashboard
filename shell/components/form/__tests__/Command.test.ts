@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import Command from '@shell/components/form/Command.vue';
+import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { _EDIT } from '@shell/config/query-params';
 
 describe('component: Command', () => {
@@ -59,6 +60,19 @@ describe('component: Command', () => {
     await wrapper.trigger('keydown.enter');
 
     expect(wrapper.emitted('update:value')).toHaveLength(1);
+  });
+
+  it('should translate the stdin option labels and keep their values', () => {
+    const wrapper = mount(Command, {
+      props: { mode: _EDIT },
+      data:  () => ({ stdin: true })
+    });
+
+    expect(wrapper.findComponent(LabeledSelect).props('options')).toStrictEqual([
+      { label: '%generic.no%', value: 'No' },
+      { label: '%workload.container.command.once%', value: 'Once' },
+      { label: '%generic.yes%', value: 'Yes' },
+    ]);
   });
 });
 //

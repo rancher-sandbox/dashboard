@@ -95,7 +95,7 @@ export default {
         let ariaLabel = '';
 
         this.values.forEach((val) => {
-          ariaLabel += `${ val.value } ${ val.value === 1 ? 'item' : 'items' } ${ val.label }`;
+          ariaLabel += this.t('progressBar.ariaLabel', { count: val.value, label: val.label }, true);
         });
 
         return ariaLabel;

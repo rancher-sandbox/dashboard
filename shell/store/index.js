@@ -1042,7 +1042,10 @@ export const actions = {
     // Try and wait until the schema exists before proceeding
     await dispatch('management/waitForSchema', { type: MANAGEMENT.CLUSTER });
     // Similarly to above, we somehow get here without everything in management land being ready. FF needed to determine pagination state
-    await dispatch('management/waitForHaveAll', { type: MANAGEMENT.FEATURE });
+    // features/loadServer fetches the flags only when they can be listed; otherwise this wait could only run out its retries
+    if (getters['management/canList'](MANAGEMENT.FEATURE)) {
+      await dispatch('management/waitForHaveAll', { type: MANAGEMENT.FEATURE });
+    }
 
     // If SSP is on we won't have requested all clusters
     if (!paginateClusters({ rootGetters, state })) {

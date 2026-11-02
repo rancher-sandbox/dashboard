@@ -13,13 +13,13 @@ export default {
 
     const leader = await hasLeader(monitoringVersion, this.$store.dispatch, this.currentCluster.id);
 
-    this.hasLeader = leader ? 'Yes' : 'No';
+    this.hasLeader = leader ? this.t('generic.yes') : this.t('generic.no');
     this.leaderChanges = await leaderChanges(monitoringVersion, this.$store.dispatch, this.currentCluster.id);
     this.failedProposals = await failedProposals(monitoringVersion, this.$store.dispatch, this.currentCluster.id);
   },
   data() {
     return {
-      hasLeader:       'No',
+      hasLeader:       this.t('generic.no'),
       leaderChanges:   0,
       failedProposals: 0
     };

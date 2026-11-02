@@ -240,13 +240,13 @@ export default {
     <InfoBox v-if="currentClaim">
       <div class="row">
         <div class="col span-6 text-center">
-          <label class="text-muted">Persistent Volume Claim:</label>&nbsp;
+          <label class="text-muted">{{ t('persistentVolume.claim') }}</label>&nbsp;
           <router-link :to="currentClaim.detailLocation">
             {{ currentClaim.namespacedName }}
           </router-link>
         </div>
         <div class="col span-6 text-center">
-          <label class="text-muted">Age:</label>&nbsp;
+          <label class="text-muted">{{ t('persistentVolume.age') }}</label>&nbsp;
           <LiveDate
             class="live-date"
             :value="value.metadata.creationTimestamp"

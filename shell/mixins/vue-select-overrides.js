@@ -1,6 +1,46 @@
+// vue-select builds each deselect button's title from this prefix and the option's label.
+const DESELECT_PREFIX = 'Deselect ';
 
 export default {
+  mounted() {
+    this.translateVueSelect();
+  },
+
+  updated() {
+    this.translateVueSelect();
+  },
+
   methods: {
+    // vue-select does not expose these strings as props, so replace them in the rendered DOM.
+    translateVueSelect() {
+      const exists = this.$store?.getters?.['i18n/exists'];
+      const t = this.$store?.getters?.['i18n/t'];
+
+      // A newer @rancher/shell can run inside an older Rancher without these keys, so keep vue-select's English.
+      if (typeof exists !== 'function' || typeof t !== 'function' || !exists('labeledSelect.searchOption')) {
+        return;
+      }
+
+      const setLabel = (el, label) => {
+        el.title = label;
+        el.setAttribute('aria-label', label);
+      };
+
+      this.$el.querySelector('.vs__dropdown-toggle')?.setAttribute('aria-label', t('labeledSelect.searchOption'));
+
+      this.$el.querySelectorAll('.vs__clear').forEach((el) => setLabel(el, t('labeledSelect.clearSelected')));
+
+      this.$el.querySelectorAll('.vs__deselect').forEach((el) => {
+        if (el.title.startsWith(DESELECT_PREFIX)) {
+          setLabel(el, t('labeledSelect.deselect', { option: el.title.slice(DESELECT_PREFIX.length) }));
+        }
+      });
+
+      this.$el.querySelectorAll('.vs__spinner').forEach((el) => {
+        el.textContent = t('labeledSelect.loading');
+      });
+    },
+
     mappedKeys(map, vm) {
       // Defaults found at - https://github.com/sagalbot/vue-select/blob/master/src/components/Select.vue#L947
       const out = { ...map };

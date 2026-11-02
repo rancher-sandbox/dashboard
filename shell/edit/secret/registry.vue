@@ -83,7 +83,12 @@ export default {
 
   computed: {
     registryAddresses() {
-      return ['Custom', 'DockerHub', 'Quay.io', 'Artifactory'];
+      return [
+        { label: this.t('generic.custom'), value: 'Custom' },
+        { label: 'DockerHub', value: 'DockerHub' },
+        { label: 'Quay.io', value: 'Quay.io' },
+        { label: 'Artifactory', value: 'Artifactory' },
+      ];
     },
 
     needsDockerServer() {
@@ -151,7 +156,7 @@ export default {
         name="registryUrl"
         required
         :label="t('secret.registry.domainName')"
-        placeholder="e.g. index.docker.io"
+        :placeholder="t('generic.placeholder', {text: 'index.docker.io'}, true)"
         :mode="mode"
         :rules="getRules('registryUrl')"
       />

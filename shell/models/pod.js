@@ -84,7 +84,7 @@ export default class Pod extends WorkloadService {
       action:  'openShell',
       enabled: !!this.links.view && this.isRunning,
       icon:    'icon-chevron-right',
-      label:   'Execute Shell',
+      label:   this.t('action.openShell'),
       total:   1,
     };
   }
@@ -94,7 +94,7 @@ export default class Pod extends WorkloadService {
       action:  'openLogs',
       enabled: !!this.links.view,
       icon:    'icon icon-chevron-right',
-      label:   'View Logs',
+      label:   this.t('action.openLogs'),
       total:   1,
     };
   }
@@ -232,7 +232,7 @@ export default class Pod extends WorkloadService {
 
     if ( this.workloadRef ) {
       out.push({
-        label:         'Workload',
+        label:         this.t('workload.detailTop.workload'),
         formatter:     'LinkName',
         formatterOpts: {
           value:     this.workloadRef.name,
@@ -245,7 +245,7 @@ export default class Pod extends WorkloadService {
 
     if ( this.spec.nodeName ) {
       out.push({
-        label:         'Node',
+        label:         this.t('workload.detailTop.node'),
         formatter:     'LinkName',
         formatterOpts: { type: NODE, value: this.spec.nodeName },
         content:       this.spec.nodeName,

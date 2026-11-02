@@ -256,7 +256,7 @@ export default {
           v-model:value="rule.tolerationSeconds"
           :disabled="rule.effect !== 'NoExecute'"
           :mode="mode"
-          suffix="Seconds"
+          :suffix="t('suffix.seconds', { count: rule.tolerationSeconds })"
           :data-testid="`toleration-seconds-index${ index }`"
           class="height-adjust-input"
           @update:value="update"
